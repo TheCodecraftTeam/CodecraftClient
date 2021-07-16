@@ -583,6 +583,22 @@ for(Block DownBlock : DownBlocks) {
 	if(DownBlock != null) {
 	while(true) {
 
+		
+		if(hitbox.checkCollsionWithBlock(DownBlock,x2,y,z2)) {
+			break;
+		}else {
+			x2 -= offset *  Math.sin( yawRadian ) * Math.cos( pitchRadian );
+			y2 -= offset * -Math.sin( pitchRadian );
+			z2 += (offset *  Math.cos( yawRadian ) * Math.cos( pitchRadian ));
+			tn++;
+			if(tn > 100) {
+				break;
+			}
+		}
+}
+	}
+}
+
 	
 	
 	
