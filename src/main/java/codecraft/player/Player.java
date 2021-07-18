@@ -3,12 +3,17 @@ package codecraft.player;
 import codecraft.entity.PlayerHitBox;
 
 public class Player {
-	public static float posX = 0;
-	public static float posY = -100;
+	public static float posX = -1;
+	public static float posY = -1000;
 	public static float posZ = -5;
-	public static float OldposX = 0;
-	public static float OldposY = -100;
+	public static float OldposX = -1;
+	public static float OldposY = -1000;
 	public static float OldposZ = -5;
+	public static float placeBlockOffsetX = 0;
+	public static float placeBlockOffsetY = 0;
+	public static float placeBlockOffsetZ = 0;
+	public static Boolean pu =false;
+	public static Boolean pd =false;
 	public static float rotX = 0;
 	public static float posDY = 0;
 	public static boolean isinTheAir = true;

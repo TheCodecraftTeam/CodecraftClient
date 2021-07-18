@@ -2,7 +2,9 @@ package codecraft.world.generator;
 
 import codecraft.world.Block;
 import codecraft.world.Chunk;
+import codecraft.world.blocks.BlockDirt;
 import codecraft.world.blocks.BlockGrass;
+import codecraft.world.blocks.BlockStone;
 
 public class FlatWorldGenerator {
 
@@ -10,6 +12,7 @@ public class FlatWorldGenerator {
 		Chunk[][] generatedChunks = new Chunk[16][16];
 		 int startHeight = 25;
 		  int height = 50;
+		  
 		  int cx = 0;
 		  int cy = 0;
 		  int cz = 0;
@@ -33,10 +36,10 @@ public class FlatWorldGenerator {
 
 				
 	if(y < height -5) {
-		Blocks[x][y][z] = new BlockGrass(x, y, z,cx,cz);
+		Blocks[x][y][z] = new BlockStone(x, y, z,cx,cz);
 	}
 	if(y >= height - 5) {
-		Blocks[x][y][z] = new BlockGrass(x, y, z,cx,cz);
+		Blocks[x][y][z] = new BlockDirt(x, y, z,cx,cz);
 	}
 	if(y==height) {
 				Blocks[x][y][z] = new BlockGrass(x, y, z,cx,cz);
@@ -56,6 +59,12 @@ public class FlatWorldGenerator {
 					   
 					   
 					}
+				   
+				   
+				   
+				   
+				   
+				   
 				   if (z > 15) {
 					   break;
 					}else {

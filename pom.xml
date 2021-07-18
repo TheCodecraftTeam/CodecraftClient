@@ -107,7 +107,13 @@
 		</dependency>
 	</dependencies>
 </dependencyManagement>
-
+<repositories>
+<repository>
+<id>ui</id>
+<name>ui</name>
+<url>https://raw.github.com/SpinyOwl/repo/releases</url>
+</repository>
+</repositories>
 <dependencies>
 	<dependency>
 		<groupId>org.lwjgl</groupId>
@@ -177,6 +183,12 @@
 		<artifactId>joml</artifactId>
 		<version>${joml.version}</version>
 	</dependency>
+	<!-- LEGUI - https://github.com/SpinyOwl/legui -->
+<dependency>
+   <groupId>org.liquidengine</groupId>
+   <artifactId>legui</artifactId>
+   <version>3.3.2</version>
+</dependency>
 	
 </dependencies>
 </project>

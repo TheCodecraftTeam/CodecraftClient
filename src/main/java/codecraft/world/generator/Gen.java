@@ -4,7 +4,7 @@ import java.util.Random;
 
 public class Gen {
 
-  	public static float AMPLITUDE = 100f;
+  	public static float AMPLITUDE = 25f;
     public static int OCTAVES = 7;
     public static float ROUGHNESS = 0.5f;
  

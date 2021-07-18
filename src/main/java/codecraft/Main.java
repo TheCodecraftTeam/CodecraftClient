@@ -33,7 +33,7 @@ public class Main {
 	WindowUtils.createWindowAndOpenglContext("Codecraft", 1920,1080);
 	WindowUtils.configureOpenGL();
 	WindowUtils.setupKeyBindingsAndMouse();
-	Chunk[][] chunks = FlatWorldGenerator.generateWorld();
+	Chunk[][] chunks = NormalWorldGenerator.generateWorld();
 	World.loadChunks(chunks);
 	long st = System.currentTimeMillis();
 	
@@ -51,12 +51,10 @@ public class Main {
 		
 	
 		}
+		WindowUtils.getBlockPlayerIsLookingAt();
 		WindowUtils.updateXY();
 		Block DownBlock1 = null;
-		Vector3f BLA = WindowUtils.getBlockPlayerIsLookingAt();
-		System.out.println("x:"+BLA.x);
-		System.out.println("y:"+BLA.y);
-		System.out.println("z:"+BLA.z);
+		
 		int x =(int) Math.roundHalfDown(-Player.posX);
 		int y = (int) Math.roundHalfDown(-Player.posY);
 		int z = (int) Math.roundHalfDown(-Player.posZ);
@@ -100,12 +98,14 @@ public class Main {
 		//System.out.println("x : " + v.x);
 		//System.out.println("y : " + v.y);
 		//System.out.println("z : " + v.z);
+		
 		World.drawWorld();
+		
 		GLFW.glfwSwapBuffers(WindowVariables.window);
 
         /* Poll for and process events */
-		if(System.currentTimeMillis() - st >= 3000) {
-			World.loadChunks(chunks);
+		if(System.currentTimeMillis() - st >= 15000) {
+			World.loadChunks(World.chunks);
 			st = System.currentTimeMillis();
 		}
 		WindowUtils.FPS(60, System.currentTimeMillis() - startTime);

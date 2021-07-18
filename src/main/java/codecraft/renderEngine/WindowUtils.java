@@ -19,6 +19,7 @@ import static org.lwjgl.system.MemoryUtil.NULL;
 
 import java.awt.Font;
 import java.io.FileNotFoundException;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.FloatBuffer;
 
 import javax.swing.text.StyledEditorKit.FontSizeAction;
@@ -31,6 +32,7 @@ import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWCursorPosCallback;
 import org.lwjgl.glfw.GLFWCursorPosCallbackI;
 import org.lwjgl.glfw.GLFWKeyCallback;
+import org.lwjgl.glfw.GLFWMouseButtonCallback;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
@@ -41,12 +43,14 @@ import codecraft.entity.StaticHitBox;
 import codecraft.player.Player;
 import codecraft.world.Block;
 import codecraft.world.World;
+import codecraft.world.blocks.BlockGrass;
+import codecraft.world.blocks.BlockStone;
 import modifedLibraries.rockscode.util.GLText;
 
 
 
 public class WindowUtils {
-private static Texture t = new Texture();
+
 
 public static void createWindowAndOpenglContext(String title, int width, int height) {
 	WindowVariables.height = height;
@@ -55,7 +59,7 @@ public static void createWindowAndOpenglContext(String title, int width, int hei
 	        return;
 
 	    /* Create a windowed mode window and its OpenGL context */
-	 WindowVariables.window = glfwCreateWindow(width, height, title,NULL, NULL);
+	 WindowVariables.window = glfwCreateWindow(width, height, title,GLFW.glfwGetPrimaryMonitor(), NULL);
 	    if (WindowVariables.window == 0)
 	    {
 	    	GLFW.glfwTerminate();
@@ -64,13 +68,13 @@ public static void createWindowAndOpenglContext(String title, int width, int hei
 	 	    /* Make the window's context current */
 	    GLFW.glfwMakeContextCurrent(WindowVariables.window);
 	    GL.createCapabilities();
-	    t.init("textures/a.bmp");
+	    
 }
 public static void configureOpenGL() {
 	
 	FloatBuffer fb = BufferUtils.createFloatBuffer(16);
     Matrix4f m = new Matrix4f();
-    m.setPerspective((float) Math.toRadians(50.0f), (float)WindowVariables.width/(float)WindowVariables.height, 0.01f,50.0f);
+    m.setPerspective((float) Math.toRadians(50.0f), (float)WindowVariables.width/(float)WindowVariables.height, 0.01f,1000.0f);
     glMatrixMode(GL_PROJECTION);
     glLoadMatrixf(m.get(fb));
     m.setLookAt(0.0f, 0.0f, 10.0f,
@@ -112,6 +116,20 @@ public static void setupKeyBindingsAndMouse() {
 			
 		}
 	});
+GLFW.glfwSetMouseButtonCallback(WindowVariables.window,new GLFWMouseButtonCallback() {
+	
+	@Override
+	public void invoke(long window, int button, int action, int mods) {
+		 if (button == GLFW.GLFW_MOUSE_BUTTON_RIGHT && action == GLFW.GLFW_PRESS) {
+			 WindowVariables.pressedRightClick = true;
+		 }
+		 
+		 if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT && action == GLFW.GLFW_PRESS) {
+			 WindowVariables.pressedLeftClick = true;
+		 }
+		
+	}
+});
 	GLFW.glfwSetCursorPosCallback(WindowVariables.window, new GLFWCursorPosCallback() {
 		
 		public void invoke(long window, double x, double y) {
@@ -140,10 +158,32 @@ public static void setupKeyBindingsAndMouse() {
 	
 	
 }
-public static void CheckKeys() {
+public static void showBlockWherePlayerIsLookin() {
+
+	 
+}
+public static void CheckKeys()  {
+	if(GLFW.glfwGetKey(WindowVariables.window, GLFW.GLFW_KEY_UP)== GLFW.GLFW_PRESS) {
+		if(!Player.pu) {
+		Player.placeBlockOffsetY++;
+		Player.pu = true;
+		}
+	}else {
+		Player.pu = false;
+	}
 	
+if(GLFW.glfwGetKey(WindowVariables.window, GLFW.GLFW_KEY_DOWN)== GLFW.GLFW_PRESS) {
+	if(!Player.pd) {
+		Player.placeBlockOffsetY--;
+		Player.pd = true;
+		}
+	}else {
+		Player.pd = false;
+	}
 	if(GLFW.glfwGetKey(WindowVariables.window, GLFW.GLFW_KEY_W)== GLFW.GLFW_PRESS) {
+		
 	float yawRadian = (float) ((Player.rotX) * (Math.PI / 180f));
+	
 	if(Player.isinTheAir) {
 		Player.posX += 0.2f * Math.sin( yawRadian )* Math.cos( 90 );
 		Player.posZ -= 0.2f * Math.cos( yawRadian )* Math.cos( 90 );
@@ -151,6 +191,17 @@ public static void CheckKeys() {
 	Player.posX += 0.5f * Math.sin( yawRadian )* Math.cos( 90 );
 	Player.posZ -= 0.5f * Math.cos( yawRadian )* Math.cos( 90 );
 	}
+	
+	
+	float offset = 0.1f;
+	float pitchRadian = (float) (Player.rotY * (Math.PI / 180)); // X rotation
+	
+	//float yawRadian   = (float) (-Player.rotX * (Math.PI / 180)); // Y rotation
+	/*
+	Player.posX -= offset *  Math.sin( yawRadian ) * Math.cos( pitchRadian );
+	Player.posY -= offset * -Math.sin( pitchRadian );
+	Player.posZ += (offset *  Math.cos( yawRadian ) * Math.cos( pitchRadian ));
+	*/
 	}
 	if(GLFW.glfwGetKey(WindowVariables.window, GLFW.GLFW_KEY_SPACE) == GLFW.GLFW_PRESS){
 		if(!Player.isinTheAir) {
@@ -254,6 +305,127 @@ if(DownBlock != null) {
 			
 			Player.posDY = 0;
 			Player.isinTheAir = false;
+			if( WindowVariables.pressedRightClick == true) {
+				
+				
+				try {
+					World.SetBlockAtPosition((int)DownBlock.getGlobalX(),(int)DownBlock.getGlobalY()+1 + (int)Player.placeBlockOffsetY, (int)DownBlock.getGlobalZ(), BlockStone.class);
+				} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+						| InvocationTargetException | SecurityException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				Player.posY-=2;
+				int chunkXpos = (int)DownBlock.getGlobalX();
+				 int chunkX;
+				 while(true) {
+					 if(chunkXpos % 16 == 0) {
+						 break;
+					 }
+					chunkXpos--;
+				 }
+				 chunkX = chunkXpos/16;
+				 
+				 
+				 int chunkZpos = (int)DownBlock.getGlobalZ();
+				 int chunkZ;
+				 while(true) {
+					 if(chunkZpos % 16 == 0) {
+						 break;
+					 }
+					chunkZpos--;
+				 }
+				 chunkZ = chunkZpos/16;
+				 int i;
+				 try {
+				 i = World.ChunkPositonToChunkNumber(chunkX, chunkZ);
+				 GL11.glNewList(World.displayListIndex +i, GL11.GL_COMPILE);
+				 World.chunks[chunkX][chunkZ].DrawChunk();
+				 GL11.glEndList();
+				 }catch(Exception e) {
+					 
+				 }
+				 WindowVariables.pressedRightClick = false;
+				 
+			}
+			
+			
+			
+if( WindowVariables.pressedLeftClick == true) {
+				
+				
+				try {
+					World.SetBlockAtPosition((int)DownBlock.getGlobalX(),(int)DownBlock.getGlobalY() , (int)DownBlock.getGlobalZ(), null);
+				} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+						| InvocationTargetException | SecurityException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				
+				int chunkXpos = (int)DownBlock.getGlobalX();
+				 int chunkX;
+				 while(true) {
+					 if(chunkXpos % 16 == 0) {
+						 break;
+					 }
+					chunkXpos--;
+				 }
+				 chunkX = chunkXpos/16;
+				 
+				 
+				 int chunkZpos = (int)DownBlock.getGlobalZ();
+				 int chunkZ;
+				 while(true) {
+					 if(chunkZpos % 16 == 0) {
+						 break;
+					 }
+					chunkZpos--;
+				 }
+				 chunkZ = chunkZpos/16;
+				 int i;
+				 try {
+				 i = World.ChunkPositonToChunkNumber(chunkX, chunkZ);
+				 GL11.glNewList(World.displayListIndex +i, GL11.GL_COMPILE);
+				 World.chunks[chunkX][chunkZ].DrawChunk();
+				 GL11.glEndList();
+				 }catch(Exception e) {
+					 
+				 }
+				 try {
+					 i = World.ChunkPositonToChunkNumber(chunkX+1, chunkZ);
+					 GL11.glNewList(World.displayListIndex +i, GL11.GL_COMPILE);
+					 World.chunks[chunkX+1][chunkZ].DrawChunk();
+					 GL11.glEndList();
+					 }catch(Exception e) {
+						 
+					 }
+				 try {
+					 i = World.ChunkPositonToChunkNumber(chunkX, chunkZ+1);
+					 GL11.glNewList(World.displayListIndex +i, GL11.GL_COMPILE);
+					 World.chunks[chunkX][chunkZ+1].DrawChunk();
+					 GL11.glEndList();
+					 }catch(Exception e) {
+						 
+					 }
+				 try {
+					 i = World.ChunkPositonToChunkNumber(chunkX-1, chunkZ);
+					 GL11.glNewList(World.displayListIndex +i, GL11.GL_COMPILE);
+					 World.chunks[chunkX-1][chunkZ].DrawChunk();
+					 GL11.glEndList();
+					 }catch(Exception e) {
+						 
+					 }
+				 try {
+					 i = World.ChunkPositonToChunkNumber(chunkX, chunkZ-1);
+					 GL11.glNewList(World.displayListIndex +i, GL11.GL_COMPILE);
+					 World.chunks[chunkX][chunkZ-1].DrawChunk();
+					 GL11.glEndList();
+					 }catch(Exception e) {
+						 
+					 }
+				 WindowVariables.pressedLeftClick = false;
+				 
+			}
 		}
 	}
 }
@@ -572,8 +744,8 @@ try {
 }
 */
 	float offset = 0.1f;
-	float pitchRadian = (float) (Player.rotY/2 * (Math.PI / 180)); // X rotation
-	float yawRadian   = (float) (-Player.rotX * (Math.PI / 180)); // Y rotation
+	float pitchRadian = (float) (Player.rotY * (Math.PI / 180)); // X rotation
+	float yawRadian   = (float) (Player.rotX * (Math.PI / 180)); // Y rotation
 	float x2 =-Player.posX;
 	float y2 = -Player.posY+2;
 	float z2 = -Player.posZ;
@@ -585,6 +757,7 @@ for(Block DownBlock : DownBlocks) {
 
 		
 		if(hitbox.checkCollsionWithBlock(DownBlock,x2,y,z2)) {
+			System.out.printf("%f %f %f", Math.floor(x2),Math.floor(y2),Math.floor(z2));
 			break;
 		}else {
 			x2 -= offset *  Math.sin( yawRadian ) * Math.cos( pitchRadian );
@@ -602,7 +775,7 @@ for(Block DownBlock : DownBlocks) {
 	
 	
 	
-	return new Vector3f(Math.roundHalfDown(x2),Math.roundHalfDown(y2),Math.roundHalfDown(z2));
+	return new Vector3f(Math.floor(x2),Math.floor(y2),Math.floor(z2));
 	
 	
 }

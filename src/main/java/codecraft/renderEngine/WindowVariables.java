@@ -5,7 +5,8 @@ import org.joml.Matrix4f;
 public class WindowVariables {
 static int width = 0;
 static int height = 0;
-
+static boolean pressedRightClick = false;
+static boolean pressedLeftClick = false;
 static boolean done = false;
 static Matrix4f m;
 public static long window = 0;
