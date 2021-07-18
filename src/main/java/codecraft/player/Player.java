@@ -1,5 +1,8 @@
 package codecraft.player;
 
+import org.joml.Vector3f;
+import org.lwjgl.opengl.GL11;
+
 import codecraft.entity.PlayerHitBox;
 
 public class Player {
@@ -52,7 +55,42 @@ public class Player {
 	public static PlayerHitBox getEntityHitBox() {
 		return entityHitBox;
 	}
-	
+	public static void drawHotBars() {
+		
+	}
+	public static void drawHotBar(float x, float y, float z, Vector3f color) {
+		GL11.glColor3f(color.x, color.y, color.z);
+		GL11.glBegin(GL11.GL_QUADS);
+		GL11.glVertex3f(x + 0.01f, y + 0.001f-+ 0.01f, z);
+		GL11.glVertex3f(x - 0.01f, y + 0.001f-+ 0.01f, z);
+		GL11.glVertex3f(x - 0.01f, y - 0.001f-+ 0.01f, z);
+		GL11.glVertex3f(x + 0.01f, y - 0.001f-+ 0.01f, z);
+		GL11.glEnd();
+		
+		GL11.glBegin(GL11.GL_QUADS);
+		GL11.glVertex3f(x + 0.01f, y + 0.001f+ 0.01f, z);
+		GL11.glVertex3f(x - 0.01f, y + 0.001f+ 0.01f, z);
+		GL11.glVertex3f(x - 0.01f, y - 0.001f+ 0.01f, z);
+		GL11.glVertex3f(x + 0.01f, y - 0.001f+ 0.01f, z);
+		GL11.glEnd();
+		
+		GL11.glColor3f(color.x, color.y, color.z);
+		GL11.glBegin(GL11.GL_QUADS);
+		GL11.glVertex3f(x + 0.001f-+ 0.01f, y + + 0.01f, z);
+		GL11.glVertex3f(x + 0.001f-+ 0.01f, y - 0.01f, z);
+		GL11.glVertex3f(x - 0.001f-+ 0.01f, y - 0.01f, z);
+		GL11.glVertex3f(x - 0.001f-+ 0.01f, y + 0.01f, z);
+		GL11.glEnd();
+		GL11.glBegin(GL11.GL_QUADS);
+		GL11.glVertex3f(x + 0.001f+ 0.01f, y + + 0.01f, z);
+		GL11.glVertex3f(x + 0.001f+ 0.01f, y - 0.01f, z);
+		GL11.glVertex3f(x - 0.001f+ 0.01f, y - 0.01f, z);
+		GL11.glVertex3f(x - 0.001f+ 0.01f, y + 0.01f, z);
+		GL11.glEnd();
+		
+		
+		GL11.glColor3f(1, 1, 1);
+	}
 
 
 }

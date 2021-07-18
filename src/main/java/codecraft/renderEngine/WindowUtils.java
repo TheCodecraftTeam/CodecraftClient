@@ -41,10 +41,12 @@ import org.lwjgl.opengl.GL30;
 import codecraft.entity.PlayerHitBox;
 import codecraft.entity.StaticHitBox;
 import codecraft.player.Player;
+import codecraft.ui.charModels.C0;
 import codecraft.world.Block;
 import codecraft.world.World;
 import codecraft.world.blocks.BlockGrass;
 import codecraft.world.blocks.BlockStone;
+import codecraft.world.blocks.BlockWood;
 import modifedLibraries.rockscode.util.GLText;
 
 
@@ -90,6 +92,7 @@ public static void configureOpenGL() {
 	   float mat_shininess[] = { 100.0f };
 	  float light_position[] = { 1.0f, 10.0f, 1.0f, 0.0f};
 	   GL11.glClearColor (0.0f, 0.0f, 0.0f, 0.0f);
+	   
 	   //glEnable(GL11.GL_CULL_FACE);
 	   //GL11.glShadeModel (GL11.GL_SMOOTH);
 /*
@@ -300,7 +303,7 @@ try {
 Block[] DownBlocks = {DownBlock1/*,DownBlock2,DownBlock3,DownBlock4,DownBlock5,DownBlock6,DownBlock7,DownBlock8,DownBlock9*/};
 for(Block DownBlock : DownBlocks) {
 if(DownBlock != null) {
-		if(Player.getEntityHitBox().checkCollsionWithBlock(DownBlock)) {
+		if(Player.getEntityHitBox().checkCollsionWithBlock(DownBlock, 0)) {
 			Player.posY = Math.floor(Player.posY);
 			
 			Player.posDY = 0;
@@ -309,7 +312,7 @@ if(DownBlock != null) {
 				
 				
 				try {
-					World.SetBlockAtPosition((int)DownBlock.getGlobalX(),(int)DownBlock.getGlobalY()+1 + (int)Player.placeBlockOffsetY, (int)DownBlock.getGlobalZ(), BlockStone.class);
+					World.SetBlockAtPosition((int)DownBlock.getGlobalX(),(int)DownBlock.getGlobalY()+1 + (int)Player.placeBlockOffsetY, (int)DownBlock.getGlobalZ(), BlockWood.class);
 				} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
 						| InvocationTargetException | SecurityException e1) {
 					// TODO Auto-generated catch block
@@ -444,9 +447,12 @@ public static void updateXY() {
 	Block DownBlock8 = null;
 	Block DownBlock9 = null;
 	*/
+	
 	int x =(int) Math.roundHalfDown(-Player.posX);
 	int y = (int) Math.roundHalfDown(-Player.posY);
 	int z = (int) Math.roundHalfDown(-Player.posZ);
+	
+	int i =0;
 	while(true) {
 		try {
 			SideBlock1 = World.getBlockAtPos(x,y,z);
@@ -460,14 +466,23 @@ public static void updateXY() {
 		}
 	}
 	int x2 =(int) Math.roundHalfDown(-Player.posX);
-	int y2 = (int) Math.roundHalfDown(-Player.posY);
+	int y2 = (int) Math.roundHalfDown(-Player.posY+1);
 	int z2 = (int) Math.roundHalfDown(-Player.posZ);
+	System.out.println(y2+1);
+	System.out.println("real:" + Player.posY);
 	while(true) {
-		try {
-			SideBlock2 = World.getBlockAtPos(x2,y2+1,z2);
+   		try {
+			SideBlock2 = World.getBlockAtPos(x2,y2,z2);
+			if(SideBlock2 == null) {
+				x2--;
+				if(x2 <= -Player.posX -10) {
+					break;
+				}
+				continue;
+			}
 			break;
-		}catch(Exception e){
-			x2--;
+   		}catch(Exception e){
+   			x2--;
 			if(x2 <= -Player.posX -10) {
 				break;
 			}
@@ -477,11 +492,13 @@ public static void updateXY() {
 Block[] DownBlocks = {SideBlock1 ,SideBlock2};
 for(Block DownBlock : DownBlocks) {
 if(DownBlock != null) {
-		if(Player.getEntityHitBox().checkCollsionWithBlock(DownBlock)) {
+		if(Player.getEntityHitBox().checkCollsionWithBlock(DownBlock, i)) {
 			Player.posX =Player.OldposX;
 		}
 	}
+i++;
 }
+i=0;
 Block SideBlock3 = null;
 
 Block SideBlock4 = null;
@@ -510,11 +527,18 @@ while(true) {
 	}
 }
 int x4 =(int) Math.roundHalfDown(-Player.posX);
-int y4 = (int) Math.roundHalfDown(-Player.posY);
+int y4 = (int) Math.roundHalfDown(-Player.posY+1);
 int z4 = (int) Math.roundHalfDown(-Player.posZ);
 while(true) {
 	try {
 		SideBlock4 = World.getBlockAtPos(x4,y4,z4);
+		if(SideBlock4 == null) {
+			x4++;
+			if(x4 <= -Player.posX +10) {
+				break;
+			}
+			continue;
+		}
 		break;
 	}catch(Exception e){
 		x4++;
@@ -527,13 +551,14 @@ while(true) {
 Block[] Blocks2 = {SideBlock3 ,SideBlock4};
 for(Block DownBlock : Blocks2) {
 if(DownBlock != null) {
-	if(Player.getEntityHitBox().checkCollsionWithBlock(DownBlock)) {
+	if(Player.getEntityHitBox().checkCollsionWithBlock(DownBlock, i)) {
 		Player.posX = Player.OldposX;
-		break;
+		
 	}
 }
+i++;
 }
-
+i = 0;
 
 Block SideBlock5 = null;
 
@@ -555,19 +580,26 @@ while(true) {
 		SideBlock5 = World.getBlockAtPos(x5,y5,z5);
 		
 		break;
-	}catch(Exception e){
-		z5--;
+         	}catch(Exception e){
+ 		z5--;
 		if(z5 <=-Player.posZ -10) {
 			break;
 		}
 	}
 }
-int x6 =(int) Math.roundHalfDown(-Player.posX);
-int y6 = (int) Math.roundHalfDown(-Player.posY);
+ int x6 =(int) Math.roundHalfDown(-Player.posX);
+int y6 = (int) Math.roundHalfDown(-Player.posY+1);
 int z6 = (int) Math.roundHalfDown(-Player.posZ);
 while(true) {
 	try {
-		SideBlock2 = World.getBlockAtPos(x6,y6+1,z6);
+		SideBlock6 = World.getBlockAtPos(x6,y6,z6);
+		if(SideBlock6 == null) {
+			z6--;
+			if(z6 <= -Player.posZ -10) {
+				break;
+			}
+			continue;
+		}
 		break;
 	}catch(Exception e){
 		z6--;
@@ -580,12 +612,14 @@ while(true) {
 Block[] Blocks3 = {SideBlock5 ,SideBlock6};
 for(Block DownBlock : Blocks3) {
 if(DownBlock != null) {
-	if(Player.getEntityHitBox().checkCollsionWithBlock(DownBlock)) {
+	if(Player.getEntityHitBox().checkCollsionWithBlock(DownBlock, i)) {
 		Player.posZ =Player.OldposZ;
-		break;
+		
 	}
 }
+i++;
 }
+i=0;
 Block SideBlock7 = null;
 
 Block SideBlock8 = null;
@@ -603,7 +637,7 @@ int y7 = (int) Math.roundHalfDown(-Player.posY);
 int z7 = (int) Math.roundHalfDown(-Player.posZ);
 while(true) {
 try {
-	SideBlock3 = World.getBlockAtPos(x7,y7,z7);
+	SideBlock7 = World.getBlockAtPos(x7,y7,z7);
 	
 	break;
 }catch(Exception e){
@@ -614,11 +648,18 @@ try {
 }
 }
 int x8 =(int) Math.roundHalfDown(-Player.posX);
-int y8 = (int) Math.roundHalfDown(-Player.posY);
+int y8 = (int) Math.roundHalfDown(-Player.posY+1);
 int z8 = (int) Math.roundHalfDown(-Player.posZ);
 while(true) {
 try {
-	SideBlock4 = World.getBlockAtPos(x8,y8+1,z8);
+	SideBlock8 = World.getBlockAtPos(x8,y8,z8);
+	if(SideBlock8 == null) {
+		z8++;
+		if(z8 <= -Player.posZ +10) {
+			break;
+		}
+		continue;
+	}
 	break;
 }catch(Exception e){
 	z8++;
@@ -631,12 +672,14 @@ try {
 Block[] Blocks4 = {SideBlock7 ,SideBlock8};
 for(Block DownBlock : Blocks4) {
 if(DownBlock != null) {
-if(Player.getEntityHitBox().checkCollsionWithBlock(DownBlock)) {
+if(Player.getEntityHitBox().checkCollsionWithBlock(DownBlock, i)) {
 	Player.posZ = Player.OldposZ;
-	break;
+	
 }
 }
+i++;
 }
+i = 0;
 }
 public static void setupNextFrame(){
 	//GL11.glCullFace(GL11.GL_BACK);
@@ -647,6 +690,8 @@ public static void setupNextFrame(){
 	//GL11.glClearColor(0f, 0f, 0f, 0f);
 	GL11.glLoadIdentity();
 	drawCrossHair();
+	Player.drawHotBar(0, 0.01f, -0.2f, new Vector3f(1,1,1));
+	//new C0().Draw(0, 0, -0.2f, 0.5f);
 	float pitchRadian = (float) (Player.rotY/2 * (Math.PI / 180)); // X rotation
 	
 	
@@ -779,4 +824,6 @@ for(Block DownBlock : DownBlocks) {
 	
 	
 }
+
+
 }

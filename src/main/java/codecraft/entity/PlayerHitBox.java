@@ -70,18 +70,18 @@ public PlayerHitBox(float x1, float y1, float z1, float x2, float y2, float z2, 
 public static boolean checkPointIntersectionWithBlock(float x, float y, float z, Block block){
 	return ((x >=-block.getGlobalX()  -1  && x <= block.getGlobalX() + 1 ) &&
 	         (y >=block.getGlobalY() - 5 && y <= block.getGlobalY()+2 ) &&
-	         (z >= block.getGlobalZ() - 0.5  && z <= block.getGlobalZ() + 0.5 ));
+	         (z >= block.getGlobalZ() - 1  && z <= block.getGlobalZ() + 1 ));
 }
 
-public boolean checkCollsionWithBlock(Block block) {
-	return (checkPointIntersectionWithBlock(x1 - Player.getPosX(),y1- Player.getPosY() - 2  - 0.5f,z1- Player.getPosZ(),block)||
-			checkPointIntersectionWithBlock(x2- Player.getPosX(),y2- Player.getPosY() - 2- 0.5f,z2- Player.getPosZ(),block)||
-			checkPointIntersectionWithBlock(x3- Player.getPosX(),y3- Player.getPosY() - 2- 0.5f,z3- Player.getPosZ(),block)||
-			checkPointIntersectionWithBlock(x4- Player.getPosX(),y4- Player.getPosY() - 2- 0.5f,z4- Player.getPosZ(),block)||
-			checkPointIntersectionWithBlock(x5- Player.getPosX(),y5- Player.getPosY() - 2- 0.5f,z5- Player.getPosZ(),block)||
-			checkPointIntersectionWithBlock(x6- Player.getPosX(),y6- Player.getPosY() - 2- 0.5f,z6- Player.getPosZ(),block)||
-			checkPointIntersectionWithBlock(x7- Player.getPosX(),y7- Player.getPosY() - 2- 0.5f,z7- Player.getPosZ(),block)||
-			checkPointIntersectionWithBlock(x8- Player.getPosX(),y8- Player.getPosY() - 2- 0.5f,z8- Player.getPosZ(),block));
+public boolean checkCollsionWithBlock(Block block, float yOffset) {
+	return (checkPointIntersectionWithBlock(x1 - Player.getPosX(),y1- Player.getPosY() - 2  - 0.5f+ yOffset,z1- Player.getPosZ(),block)||
+			checkPointIntersectionWithBlock(x2- Player.getPosX(),y2- Player.getPosY() - 2- 0.5f + yOffset,z2- Player.getPosZ(),block)||
+			checkPointIntersectionWithBlock(x3- Player.getPosX(),y3- Player.getPosY() - 2- 0.5f + yOffset,z3- Player.getPosZ(),block)||
+			checkPointIntersectionWithBlock(x4- Player.getPosX(),y4- Player.getPosY() - 2- 0.5f + yOffset,z4- Player.getPosZ(),block)||
+			checkPointIntersectionWithBlock(x5- Player.getPosX(),y5- Player.getPosY() - 2- 0.5f + yOffset,z5- Player.getPosZ(),block)||
+			checkPointIntersectionWithBlock(x6- Player.getPosX(),y6- Player.getPosY() - 2- 0.5f + yOffset,z6- Player.getPosZ(),block)||
+			checkPointIntersectionWithBlock(x7- Player.getPosX(),y7- Player.getPosY() - 2- 0.5f + yOffset,z7- Player.getPosZ(),block)||
+			checkPointIntersectionWithBlock(x8- Player.getPosX(),y8- Player.getPosY() - 2- 0.5f + yOffset,z8- Player.getPosZ(),block));
 	 
 }
 }

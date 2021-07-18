@@ -17,7 +17,7 @@ public static int displayListIndex = GL11.glGenLists(1);
 private static int oldDisplayListIndex;
 private static int chunkNumbers[][] = new int[32][32];
 private static Texture textures = new Texture();
-
+public static int i = 0;
 static {
 textures.init("Textures/Textures.bmp");
 
@@ -55,9 +55,9 @@ public static void loadChunks(Chunk chunks[][]) {
     			 }
     			 playerChunkZ = playerChunkZpos/16;
     			 
-    			 int x = -16;
-    			 int z = -16;
-    			 int i = 0;
+    			 int x = 16;
+    			 int z = -15;
+    			 i = 0;
     			 while(true) {
     				 GL11.glNewList(displayListIndex +i, GL11.GL_COMPILE);
     				 
@@ -72,7 +72,7 @@ public static void loadChunks(Chunk chunks[][]) {
     					 x = -16;
     					 z++;
     				 }
-    				 if(z > 16) {
+    				 if(z > 16){
     					 break;
     				 }
     			 }
@@ -83,7 +83,7 @@ public static void loadChunks(Chunk chunks[][]) {
 public static void drawWorld() {
 	GL11.glEnable(GL11.GL_TEXTURE_2D);
 	//WindowUtils.showBlockWherePlayerIsLookin();
-	for(int i = 0; i < 1090; i++) {
+	for(int i = 0; i <=World.i; i++) {
 	GL11.glCallList(displayListIndex + i);
 	}
 	GL11.glDisable(GL11.GL_TEXTURE_2D);

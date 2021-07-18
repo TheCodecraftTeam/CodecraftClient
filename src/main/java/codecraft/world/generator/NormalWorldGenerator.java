@@ -28,7 +28,7 @@ public class NormalWorldGenerator {
 			 int height = (int) g.generateHeight(x + (cx*16), z+ (cz*16)) + 50;
 			 for(int count = 9; count > 0; count--) {
 				 if(height % count == 0) {
-					 System.out.println(count);
+					// System.out.println(count);
 				 }
 			  }
 			 for ( i = 0; i < 16 * 256 * 16; i++) {
@@ -93,6 +93,7 @@ public class NormalWorldGenerator {
 				if (cx > 31) {
 					cx = 0;
 					cz++;
+					System.out.println(cz);
 				 }
 				
 			 }
