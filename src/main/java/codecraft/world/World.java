@@ -1,6 +1,10 @@
 package codecraft.world;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Scanner;
 
 import org.lwjgl.opengl.GL11;
 
@@ -152,4 +156,45 @@ public static void SetBlockAtPosition(int x, int y, int z,Class blockType) throw
 public static int ChunkPositonToChunkNumber(int x,int z) {
 	return chunkNumbers[x][z];
 }
+public static void saveWorldtoFile() throws IOException {
+	File cp = new File("/saves/world/chunks/");
+	File worldFile = new File("/saves/world/world.codecraftWorld");
+	int n = 0;
+	worldFile.createNewFile();
+	cp.mkdirs();
+	String worldSave = "";
+	FileWriter cfr = new FileWriter(worldFile);
+for(Chunk[] Chunks : chunks) {
+
+	for(Chunk chunk : Chunks) {
+		System.out.println(++n);
+		float x =0;
+		float y = 0;
+		float z =0;
+		
+		for(int i = 0; i < 16 *256 *16; i++) {
+		Block block = chunk.blocks[(int) x][(int) y][(int) z];
+		
+	
+					if(block != null) {
+					cfr.append((int)chunk.getChunkX() + "." + (int)chunk.getChunkZ() + "." + block.getClass().getSimpleName() + "." + (int)block.x+ "." + (int)block.y +  "." + (int)block.z + "\n");
+					}
+					y++;
+					if(y > 255) {
+						y =0;
+						x++;
+					}
+					if(x > 15) {
+						x = 0;
+						z++;
+					}
+					
+}
+}
+}
+
+
+cfr.close();
+}
+
 }

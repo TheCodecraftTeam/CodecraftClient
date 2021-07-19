@@ -4,6 +4,8 @@ import org.joml.Vector3f;
 import org.lwjgl.opengl.GL11;
 
 import codecraft.entity.PlayerHitBox;
+import codecraft.ui.Item;
+import codecraft.ui.items.ItemGrassBlock;
 
 public class Player {
 	public static float posX = -1;
@@ -12,6 +14,8 @@ public class Player {
 	public static float OldposX = -1;
 	public static float OldposY = -1000;
 	public static float OldposZ = -5;
+	public static Item itemInHand = null;
+	public static int hotBarIndex = 0;
 	public static float placeBlockOffsetX = 0;
 	public static float placeBlockOffsetY = 0;
 	public static float placeBlockOffsetZ = 0;
@@ -57,8 +61,24 @@ public class Player {
 	}
 	public static void drawHotBars() {
 		
-	}
-	public static void drawHotBar(float x, float y, float z, Vector3f color) {
+		for(int i = 0; i < 9; i++) {
+			Item item = new ItemGrassBlock();
+		Vector3f color = null;
+		if(hotBarIndex == i) {
+			color=new Vector3f(1,1,1 );
+			itemInHand = item;
+		}else {
+			color = new Vector3f(0,0,0 );
+		}
+	
+		
+		Player.drawHotBar(-0.1f + +((i * 0.0125f)+ (i*0.01f)), -0.075f, -0.2f, color, item );
+		
+		
+		}
+		
+		}
+	public static void drawHotBar(float x, float y, float z, Vector3f color, Item item) {
 		GL11.glColor3f(color.x, color.y, color.z);
 		GL11.glBegin(GL11.GL_QUADS);
 		GL11.glVertex3f(x + 0.01f, y + 0.001f-+ 0.01f, z);
@@ -74,7 +94,7 @@ public class Player {
 		GL11.glVertex3f(x + 0.01f, y - 0.001f+ 0.01f, z);
 		GL11.glEnd();
 		
-		GL11.glColor3f(color.x, color.y, color.z);
+		
 		GL11.glBegin(GL11.GL_QUADS);
 		GL11.glVertex3f(x + 0.001f-+ 0.01f, y + + 0.01f, z);
 		GL11.glVertex3f(x + 0.001f-+ 0.01f, y - 0.01f, z);
@@ -90,6 +110,9 @@ public class Player {
 		
 		
 		GL11.glColor3f(1, 1, 1);
+		GL11.glEnable(GL11.GL_TEXTURE_2D);
+		item.draw(x, y, z, 0.01f);
+		GL11.glDisable(GL11.GL_TEXTURE_2D);
 	}
 
 

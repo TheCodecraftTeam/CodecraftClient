@@ -7,7 +7,10 @@ import codecraft.world.blocks.BlockGrass;
 import codecraft.world.blocks.BlockStone;
 
 public class NormalWorldGenerator {
+	private static int i2;
 	public static Chunk[][] generateWorld() {
+		
+		
 		Gen g = new Gen();
 		Chunk[][] generatedChunks = new Chunk[32][32];
 		 
@@ -18,7 +21,7 @@ public class NormalWorldGenerator {
 		  int ch = 0;
 		
 		  int i;
-		  for (int i2 = 0; i2 < 32*32; i2++) {
+		  for (i2 = 0; i2 < 32*32; i2++) {
 
 			  Block Blocks[][][] = new Block[16][256][16];
 
@@ -103,4 +106,7 @@ public class NormalWorldGenerator {
 		return generatedChunks;
 		
 	}
+public static double getProgress() {
+	return i2/(32.0*32.0);
+}
 }

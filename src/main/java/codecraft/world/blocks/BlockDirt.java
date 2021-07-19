@@ -12,8 +12,11 @@ import codecraft.world.Block;
 
 public class BlockDirt extends Block {
 	
+		
+		
 	public BlockDirt(float x, float y, float z, float chunkX, float chunkZ) {
 		super(x, y, z, chunkX, chunkZ);
+		this.blockName = "dirt";
 		
 	}
 

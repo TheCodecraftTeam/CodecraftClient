@@ -6,6 +6,7 @@ public abstract class Block {
 	float z; 
 	float chunkX;
 	float chunkZ;
+	public static String blockName = "block";
 	public Block(float x, float y, float z, float chunkX, float chunkZ) {
 		this.x = x;
 		this.y = y;

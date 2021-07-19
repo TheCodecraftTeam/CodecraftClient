@@ -33,6 +33,7 @@ import org.lwjgl.glfw.GLFWCursorPosCallback;
 import org.lwjgl.glfw.GLFWCursorPosCallbackI;
 import org.lwjgl.glfw.GLFWKeyCallback;
 import org.lwjgl.glfw.GLFWMouseButtonCallback;
+import org.lwjgl.glfw.GLFWScrollCallback;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
@@ -41,13 +42,16 @@ import org.lwjgl.opengl.GL30;
 import codecraft.entity.PlayerHitBox;
 import codecraft.entity.StaticHitBox;
 import codecraft.player.Player;
+import codecraft.ui.Text;
 import codecraft.ui.charModels.C0;
+import codecraft.ui.charModels.C1;
+import codecraft.ui.charModels.C2;
 import codecraft.world.Block;
 import codecraft.world.World;
 import codecraft.world.blocks.BlockGrass;
 import codecraft.world.blocks.BlockStone;
 import codecraft.world.blocks.BlockWood;
-import modifedLibraries.rockscode.util.GLText;
+
 
 
 
@@ -119,6 +123,24 @@ public static void setupKeyBindingsAndMouse() {
 			
 		}
 	});
+GLFW.glfwSetScrollCallback(WindowVariables.window, new GLFWScrollCallback() {
+	
+	@Override
+	public void invoke(long window, double xoffset, double yoffset) {
+		if(yoffset > 0) {
+			Player.hotBarIndex--;
+			if(Player.hotBarIndex < 0) {
+				Player.hotBarIndex = 8;
+			}
+		}
+		if(yoffset < 0) {
+			Player.hotBarIndex++;
+			if(Player.hotBarIndex > 8) {
+				Player.hotBarIndex = 0;
+			}
+		}
+	}
+});
 GLFW.glfwSetMouseButtonCallback(WindowVariables.window,new GLFWMouseButtonCallback() {
 	
 	@Override
@@ -468,8 +490,7 @@ public static void updateXY() {
 	int x2 =(int) Math.roundHalfDown(-Player.posX);
 	int y2 = (int) Math.roundHalfDown(-Player.posY+1);
 	int z2 = (int) Math.roundHalfDown(-Player.posZ);
-	System.out.println(y2+1);
-	System.out.println("real:" + Player.posY);
+	
 	while(true) {
    		try {
 			SideBlock2 = World.getBlockAtPos(x2,y2,z2);
@@ -690,8 +711,11 @@ public static void setupNextFrame(){
 	//GL11.glClearColor(0f, 0f, 0f, 0f);
 	GL11.glLoadIdentity();
 	drawCrossHair();
-	Player.drawHotBar(0, 0.01f, -0.2f, new Vector3f(1,1,1));
-	//new C0().Draw(0, 0, -0.2f, 0.5f);
+	Player.drawHotBars();
+	Text.DrawText(-0.15f, 0.08f, -0.2f, 0.5f, String.valueOf(-Player.posX));
+	Text.DrawText(-0.15f, 0.07f, -0.2f, 0.5f, String.valueOf(-Player.posY));
+	Text.DrawText(-0.15f, 0.06f, -0.2f, 0.5f, String.valueOf(-Player.posZ));
+	
 	float pitchRadian = (float) (Player.rotY/2 * (Math.PI / 180)); // X rotation
 	
 	

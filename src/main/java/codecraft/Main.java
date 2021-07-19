@@ -15,6 +15,7 @@ import org.lwjgl.stb.STBEasyFont;
 import codecraft.player.Player;
 import codecraft.renderEngine.WindowUtils;
 import codecraft.renderEngine.WindowVariables;
+import codecraft.ui.Text;
 import codecraft.world.Block;
 import codecraft.world.Chunk;
 import codecraft.world.World;
@@ -24,7 +25,7 @@ import codecraft.world.generator.NormalWorldGenerator;
 
 
 public class Main {
-    
+	private static Chunk[][] chunks; 
 	public static void main(String[] args) throws FileNotFoundException, Exception {
 		runCodecraft("", "");
 	}
@@ -33,7 +34,28 @@ public class Main {
 	WindowUtils.createWindowAndOpenglContext("Codecraft", 1920,1080);
 	WindowUtils.configureOpenGL();
 	WindowUtils.setupKeyBindingsAndMouse();
-	Chunk[][] chunks = NormalWorldGenerator.generateWorld();
+	
+	new Thread() {
+		public void run() {
+			chunks = NormalWorldGenerator.generateWorld();
+		}
+	}.start();
+	while(NormalWorldGenerator.getProgress() < 1.0) {
+		long startTime = System.currentTimeMillis();
+		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
+		GL11.glClearColor(0.529f, 0.808f, 0.922f, 0.5f);
+		Text.DrawText(0, 0, -0.2f, 0.5f, String.valueOf((int)(NormalWorldGenerator.getProgress()*100)));
+		GL11.glLoadIdentity();
+		GLFW.glfwSwapBuffers(WindowVariables.window);
+		WindowUtils.FPS(60, System.currentTimeMillis() - startTime);
+	}
+	long startTime = System.currentTimeMillis();
+	GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
+	GL11.glClearColor(0.529f, 0.808f, 0.922f, 0.5f);
+	Text.DrawText(0, 0, -0.2f, 0.5f, String.valueOf((int)(NormalWorldGenerator.getProgress()*100)));
+	GL11.glLoadIdentity();
+	GLFW.glfwSwapBuffers(WindowVariables.window);
+	WindowUtils.FPS(60, System.currentTimeMillis() - startTime);
 	World.loadChunks(chunks);
 	long st = System.currentTimeMillis();
 	
@@ -41,7 +63,7 @@ public class Main {
 	//World.SetBlockAtPosition(0, 52, 0);
 	while (!GLFW.glfwWindowShouldClose(WindowVariables.window) && !WindowVariables.Done())
     {
-		long startTime = System.currentTimeMillis();
+		startTime = System.currentTimeMillis();
 		Player.OldposX = Player.getPosX();
 		Player.OldposY = Player.getPosY();
 		Player.OldposZ = Player.getPosZ();
@@ -110,7 +132,7 @@ public class Main {
 		}
 		WindowUtils.FPS(60, System.currentTimeMillis() - startTime);
     }
-
+	//World.saveWorldtoFile();
 	GLFW.glfwTerminate();
 	}
 

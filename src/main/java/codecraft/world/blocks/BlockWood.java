@@ -11,10 +11,10 @@ import codecraft.renderEngine.drawList;
 import codecraft.world.Block;
 
 public class BlockWood extends Block {
-	
+
 	public BlockWood(float x, float y, float z, float chunkX, float chunkZ) {
 		super(x, y, z, chunkX, chunkZ);
-		
+		this.blockName = "wood";
 	}
 
 	@Override

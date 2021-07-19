@@ -14,7 +14,7 @@ public class BlockGrass extends Block {
 	
 	public BlockGrass(float x, float y, float z, float chunkX, float chunkZ) {
 		super(x, y, z, chunkX, chunkZ);
-		
+		this.blockName = "grass";
 	}
 
 	@Override
