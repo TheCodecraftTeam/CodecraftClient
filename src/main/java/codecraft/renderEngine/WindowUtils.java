@@ -49,6 +49,7 @@ import codecraft.ui.charModels.C2;
 import codecraft.world.Block;
 import codecraft.world.World;
 import codecraft.world.blocks.BlockGrass;
+import codecraft.world.blocks.BlockPlank;
 import codecraft.world.blocks.BlockStone;
 import codecraft.world.blocks.BlockWood;
 
@@ -334,7 +335,7 @@ if(DownBlock != null) {
 				
 				
 				try {
-					World.SetBlockAtPosition((int)DownBlock.getGlobalX(),(int)DownBlock.getGlobalY()+1 + (int)Player.placeBlockOffsetY, (int)DownBlock.getGlobalZ(), BlockWood.class);
+					World.SetBlockAtPosition((int)DownBlock.getGlobalX(),(int)DownBlock.getGlobalY()+1 + (int)Player.placeBlockOffsetY, (int)DownBlock.getGlobalZ(), BlockPlank.class);
 				} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
 						| InvocationTargetException | SecurityException e1) {
 					// TODO Auto-generated catch block

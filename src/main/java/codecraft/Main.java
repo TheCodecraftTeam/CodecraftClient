@@ -12,6 +12,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.stb.STBEasyFont;
 
+import codecraft.intro.Intro1;
 import codecraft.player.Player;
 import codecraft.renderEngine.WindowUtils;
 import codecraft.renderEngine.WindowVariables;
@@ -34,7 +35,7 @@ public class Main {
 	WindowUtils.createWindowAndOpenglContext("Codecraft", 1920,1080);
 	WindowUtils.configureOpenGL();
 	WindowUtils.setupKeyBindingsAndMouse();
-	
+	Intro1.playIntro();
 	new Thread() {
 		public void run() {
 			chunks = NormalWorldGenerator.generateWorld();

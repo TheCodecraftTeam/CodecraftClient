@@ -20,7 +20,7 @@ public static Chunk chunks[][] = null;
 public static int displayListIndex = GL11.glGenLists(1);
 private static int oldDisplayListIndex;
 private static int chunkNumbers[][] = new int[32][32];
-private static Texture textures = new Texture();
+public static Texture textures = new Texture();
 public static int i = 0;
 static {
 textures.init("Textures/Textures.bmp");
