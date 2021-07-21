@@ -17,15 +17,15 @@ import codecraft.world.blocks.BlockGrass;
 
 public class World {
 public static Chunk chunks[][] = null;
-public static int displayListIndex = GL11.glGenLists(1);
+public static int displayListIndex = 0;
 private static int oldDisplayListIndex;
+public static int rd = 2;
+public static int nrd = -rd;
 private static int chunkNumbers[][] = new int[32][32];
 public static Texture textures = new Texture();
 public static int i = 0;
-static {
-textures.init("Textures/Textures.bmp");
+public static int count = 0;
 
-}
 public static void loadChunks(Chunk chunks[][]) {
 	World.chunks =  chunks;
 	
@@ -59,24 +59,29 @@ public static void loadChunks(Chunk chunks[][]) {
     			 }
     			 playerChunkZ = playerChunkZpos/16;
     			 
-    			 int x = 16;
-    			 int z = -15;
+    			 int x = nrd;
+    			 int z = nrd;
     			 i = 0;
+    			 
     			 while(true) {
+    				 int count =0;
     				 GL11.glNewList(displayListIndex +i, GL11.GL_COMPILE);
-    				 
+    				
     				 try { 
+    					 
     					 chunks[playerChunkX +x][playerChunkZ +z].DrawChunk();
     					 chunkNumbers[playerChunkX +x][playerChunkZ +z] = i;
     				 } catch(Exception e) {}
+    				 count++;
+    				 
     				 i++;
     				 GL11.glEndList();
     				 x++;
-    				 if(x > 16) {
-    					 x = -16;
+    				 if(x > rd) {
+    					 x = nrd;
     					 z++;
     				 }
-    				 if(z > 16){
+    				 if(z > rd){
     					 break;
     				 }
     			 }

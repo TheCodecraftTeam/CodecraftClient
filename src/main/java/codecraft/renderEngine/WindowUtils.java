@@ -49,7 +49,6 @@ import codecraft.ui.charModels.C2;
 import codecraft.world.Block;
 import codecraft.world.World;
 import codecraft.world.blocks.BlockGrass;
-import codecraft.world.blocks.BlockPlank;
 import codecraft.world.blocks.BlockStone;
 import codecraft.world.blocks.BlockWood;
 
@@ -211,11 +210,11 @@ if(GLFW.glfwGetKey(WindowVariables.window, GLFW.GLFW_KEY_DOWN)== GLFW.GLFW_PRESS
 	float yawRadian = (float) ((Player.rotX) * (Math.PI / 180f));
 	
 	if(Player.isinTheAir) {
-		Player.posX += 0.2f * Math.sin( yawRadian )* Math.cos( 90 );
-		Player.posZ -= 0.2f * Math.cos( yawRadian )* Math.cos( 90 );
+		Player.posX += WindowVariables.delta * ( 0.2f * Math.sin( yawRadian )* Math.cos( 90 ));
+		Player.posZ -= WindowVariables.delta *(0.2f * Math.cos( yawRadian )* Math.cos( 90 ));
 	}else {
-	Player.posX += 0.5f * Math.sin( yawRadian )* Math.cos( 90 );
-	Player.posZ -= 0.5f * Math.cos( yawRadian )* Math.cos( 90 );
+	Player.posX += WindowVariables.delta *(0.5f * Math.sin( yawRadian )* Math.cos( 90 ));
+	Player.posZ -=WindowVariables.delta * (0.5f * Math.cos( yawRadian )* Math.cos( 90 ));
 	}
 	
 	
@@ -242,44 +241,45 @@ if(GLFW.glfwGetKey(WindowVariables.window, GLFW.GLFW_KEY_DOWN)== GLFW.GLFW_PRESS
 	if(GLFW.glfwGetKey(WindowVariables.window, GLFW.GLFW_KEY_A) == GLFW.GLFW_PRESS){
 		float yawRadian = (float) ((Player.rotX) * (Math.PI / 180f));
 		if(Player.isinTheAir) {
-			Player.posX -= 0.2f * Math.cos( yawRadian )* Math.cos( 90 );
-			Player.posZ -= 0.2f * Math.sin( yawRadian )* Math.cos( 90 );
+			Player.posX -=WindowVariables.delta * (0.2f * Math.cos( yawRadian )* Math.cos( 90 ));
+			Player.posZ -= WindowVariables.delta *(0.2f * Math.sin( yawRadian )* Math.cos( 90 ));
 		
 		}else {
-		Player.posX -= 0.5f * Math.cos( yawRadian )* Math.cos( 90 );
-		Player.posZ -= 0.5f * Math.sin( yawRadian )* Math.cos( 90 );
+		Player.posX -= WindowVariables.delta *(0.5f * Math.cos( yawRadian )* Math.cos( 90 ));
+		Player.posZ -= WindowVariables.delta *(0.5f * Math.sin( yawRadian )* Math.cos( 90 ));
 		}
 	}
 	
 	if(GLFW.glfwGetKey(WindowVariables.window, GLFW.GLFW_KEY_D) == GLFW.GLFW_PRESS){
 		float yawRadian = (float) ((Player.rotX) * (Math.PI / 180f));
 		if(Player.isinTheAir) {
-			Player.posX += 0.2f * Math.cos( yawRadian )* Math.cos( 90 );
-			Player.posZ += 0.2f * Math.sin( yawRadian )* Math.cos( 90 );
+			Player.posX += WindowVariables.delta *(0.2f * Math.cos( yawRadian )* Math.cos( 90 ));
+			Player.posZ += WindowVariables.delta *(0.2f * Math.sin( yawRadian )* Math.cos( 90 ));
 		
 		}else {
-		Player.posX += 0.5f * Math.cos( yawRadian )* Math.cos( 90 );
-		Player.posZ += 0.5f * Math.sin( yawRadian )* Math.cos( 90 );
+		Player.posX += WindowVariables.delta *(0.5f * Math.cos( yawRadian )* Math.cos( 90 ));
+		Player.posZ += WindowVariables.delta *(0.5f * Math.sin( yawRadian )* Math.cos( 90 ));
 		}
 	}
 	if(GLFW.glfwGetKey(WindowVariables.window, GLFW.GLFW_KEY_S)== GLFW.GLFW_PRESS) {
 		float yawRadian = (float) ((Player.rotX) * (Math.PI / 180f));
 		if(Player.isinTheAir) {
-			Player.posX -= 0.2f * Math.sin( yawRadian )* Math.cos( 90 );
-			Player.posZ += 0.2f * Math.cos( yawRadian )* Math.cos( 90 );
+			Player.posX -= WindowVariables.delta *(0.2f * Math.sin( yawRadian )* Math.cos( 90 ));
+			Player.posZ += WindowVariables.delta *(0.2f * Math.cos( yawRadian )* Math.cos( 90 ));
 		}else {
-		Player.posX -= 0.5f * Math.sin( yawRadian )* Math.cos( 90 );
-		Player.posZ += 0.5f * Math.cos( yawRadian )* Math.cos( 90 );
+		Player.posX -= WindowVariables.delta *(0.5f * Math.sin( yawRadian )* Math.cos( 90 ));
+		Player.posZ += WindowVariables.delta *(0.5f * Math.cos( yawRadian )* Math.cos( 90 ));
 		}
 		}
 	
 }
 public static void updateYPosition() {
-	Player.posY -= Player.posDY;
+	
 	if(-Player.posDY < 1.6f) {
-	Player.posDY -= 0.008f;
+	Player.posDY -= WindowVariables.delta *  0.008f;
 	}
-
+	for(int i = 0; i < 100; i++) {
+	Player.posY -= (WindowVariables.delta * Player.posDY)/100;
 	Block DownBlock1 = null;
 	/*
 	Block DownBlock2 = null;
@@ -323,19 +323,23 @@ try {
 }
 */
 	
-Block[] DownBlocks = {DownBlock1/*,DownBlock2,DownBlock3,DownBlock4,DownBlock5,DownBlock6,DownBlock7,DownBlock8,DownBlock9*/};
-for(Block DownBlock : DownBlocks) {
-if(DownBlock != null) {
-		if(Player.getEntityHitBox().checkCollsionWithBlock(DownBlock, 0)) {
+
+if(DownBlock1 != null) {
+		if(Player.getEntityHitBox().checkCollsionWithBlock(DownBlock1, 0)) {
 			Player.posY = Math.floor(Player.posY);
 			
 			Player.posDY = 0;
 			Player.isinTheAir = false;
+			break;
+		}
+}
+}
+			/*
 			if( WindowVariables.pressedRightClick == true) {
 				
 				
 				try {
-					World.SetBlockAtPosition((int)DownBlock.getGlobalX(),(int)DownBlock.getGlobalY()+1 + (int)Player.placeBlockOffsetY, (int)DownBlock.getGlobalZ(), BlockPlank.class);
+					World.SetBlockAtPosition((int)DownBlock.getGlobalX(),(int)DownBlock.getGlobalY()+1 + (int)Player.placeBlockOffsetY, (int)DownBlock.getGlobalZ(), BlockWood.class);
 				} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
 						| InvocationTargetException | SecurityException e1) {
 					// TODO Auto-generated catch block
@@ -452,9 +456,12 @@ if( WindowVariables.pressedLeftClick == true) {
 				 WindowVariables.pressedLeftClick = false;
 				 
 			}
-		}
-	}
-}
+			*/
+		
+		
+	
+	
+
 
 }
 public static void updateXY() {
@@ -716,6 +723,7 @@ public static void setupNextFrame(){
 	Text.DrawText(-0.15f, 0.08f, -0.2f, 0.5f, String.valueOf(-Player.posX));
 	Text.DrawText(-0.15f, 0.07f, -0.2f, 0.5f, String.valueOf(-Player.posY));
 	Text.DrawText(-0.15f, 0.06f, -0.2f, 0.5f, String.valueOf(-Player.posZ));
+	Text.DrawText(-0.15f, 0.05f, -0.2f, 0.5f, String.valueOf(WindowVariables.fps));
 	
 	float pitchRadian = (float) (Player.rotY/2 * (Math.PI / 180)); // X rotation
 	
@@ -754,7 +762,7 @@ GL11.glTexCoord2f(0,1);	GL11.glVertex3f(0.005f, -0.0003f,-0.2f);
 
 public static void FPS(int fps, long time) throws InterruptedException {
 	if(time < 1000/fps) {
-		Thread.sleep(1000/60 - time);
+		Thread.sleep(1000/fps - time);
 	}
 }
 

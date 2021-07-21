@@ -30,11 +30,10 @@ public class Intro1 {
 		DrawStoneCube(0, 3, -30);
 		DrawStoneCube(1, 3, -30);
 		DrawStoneCube(2, 2, -30);
-		DrawStoneCube(2, -2, -30
-				);
-		DrawStoneCube(-1, -3, -15);
-		DrawStoneCube(0, -3, -15);
-		DrawStoneCube(1, -3, -15);
+		DrawStoneCube(2, -2, -30);
+		DrawStoneCube(-1, -3, -30);
+		DrawStoneCube(0, -3, -30);
+		DrawStoneCube(1, -3, -30);
 		
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GLFW.glfwSwapBuffers(WindowVariables.window);

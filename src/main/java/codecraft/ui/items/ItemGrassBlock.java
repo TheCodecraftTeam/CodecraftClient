@@ -3,16 +3,61 @@ package codecraft.ui.items;
 import static org.lwjgl.opengl.GL11.GL_QUADS;
 import static org.lwjgl.opengl.GL11.glBegin;
 
+import java.lang.reflect.InvocationTargetException;
+
+import org.joml.Vector3f;
 import org.lwjgl.opengl.GL11;
 
+import codecraft.math.MathUtills;
+import codecraft.player.Player;
 import codecraft.ui.Item;
+import codecraft.world.Block;
+import codecraft.world.World;
+import codecraft.world.blocks.BlockGrass;
+import codecraft.world.blocks.BlockPlank;
 
 public class ItemGrassBlock extends Item {
 
 	@Override
 	public void action() {
-	
-		
+	Vector3f blockPosition = MathUtills.PlayerPositionToBlockPosition(-Player.posX, -Player.posY, -Player.posZ);
+	try {
+		World.SetBlockAtPosition((int)blockPosition.x,(int)blockPosition.y + (int)Player.placeBlockOffsetY, (int)blockPosition.z, BlockGrass.class);
+	} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
+			| SecurityException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	Player.posY-=2;
+	int chunkXpos = (int)blockPosition.x;
+	 int chunkX;
+	 while(true) {
+		 if(chunkXpos % 16 == 0) {
+			 break;
+		 }
+		chunkXpos--;
+	 }
+	 chunkX = chunkXpos/16;
+	 
+	 
+	 int chunkZpos = (int)blockPosition.z;
+	 int chunkZ;
+	 while(true) {
+		 if(chunkZpos % 16 == 0) {
+			 break;
+		 }
+		chunkZpos--;
+	 }
+	 chunkZ = chunkZpos/16;
+	 int i;
+	 try {
+	 i = World.ChunkPositonToChunkNumber(chunkX, chunkZ);
+	 GL11.glNewList(World.displayListIndex +i, GL11.GL_COMPILE);
+	 World.chunks[chunkX][chunkZ].DrawChunk();
+	 GL11.glEndList();
+	 }catch(Exception e) {
+		 
+	 }
 	}
 
 	@Override

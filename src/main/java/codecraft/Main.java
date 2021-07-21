@@ -28,6 +28,14 @@ import codecraft.world.generator.NormalWorldGenerator;
 public class Main {
 	private static Chunk[][] chunks; 
 	public static void main(String[] args) throws FileNotFoundException, Exception {
+		try {
+			World.rd = Integer.valueOf(args[0]);
+			World.nrd = -Integer.valueOf(args[0]);
+		}catch(Exception e) {
+			
+		}
+		World.rd = 16;
+		World.nrd = -16;
 		runCodecraft("", "");
 	}
 	public static void runCodecraft(String Username, String versionLabel) throws FileNotFoundException, Exception {
@@ -35,6 +43,7 @@ public class Main {
 	WindowUtils.createWindowAndOpenglContext("Codecraft", 1920,1080);
 	WindowUtils.configureOpenGL();
 	WindowUtils.setupKeyBindingsAndMouse();
+	World.textures.init("Textures/Textures.bmp");
 	Intro1.playIntro();
 	new Thread() {
 		public void run() {
@@ -59,11 +68,13 @@ public class Main {
 	WindowUtils.FPS(60, System.currentTimeMillis() - startTime);
 	World.loadChunks(chunks);
 	long st = System.currentTimeMillis();
-	
+	int fs = 0;
 	
 	//World.SetBlockAtPosition(0, 52, 0);
 	while (!GLFW.glfwWindowShouldClose(WindowVariables.window) && !WindowVariables.Done())
     {
+		
+		int startTimeNano = (int) System.nanoTime();
 		startTime = System.currentTimeMillis();
 		Player.OldposX = Player.getPosX();
 		Player.OldposY = Player.getPosY();
@@ -82,8 +93,9 @@ public class Main {
 		int y = (int) Math.roundHalfDown(-Player.posY);
 		int z = (int) Math.roundHalfDown(-Player.posZ);
 		//System.out.println(-Player.posY);
-		
+		double lastTime = System.nanoTime();
 		while(true) {
+		
 			try {
 				DownBlock1 = World.getBlockAtPos(x,y,z);
 				if(DownBlock1 == null) {
@@ -127,11 +139,17 @@ public class Main {
 		GLFW.glfwSwapBuffers(WindowVariables.window);
 
         /* Poll for and process events */
-		if(System.currentTimeMillis() - st >= 15000) {
+		
+		if(System.currentTimeMillis() - st >= (World.rd * 2)*1000) {
 			World.loadChunks(World.chunks);
 			st = System.currentTimeMillis();
 		}
-		WindowUtils.FPS(60, System.currentTimeMillis() - startTime);
+		
+		WindowUtils.FPS(30, System.currentTimeMillis() - startTime);
+		System.out.println(((System.currentTimeMillis()) - startTime)/ 16f );
+		 WindowVariables.delta = (System.currentTimeMillis() - startTime) / 16f;
+		 fs++;
+		 WindowVariables.fps = -(1000000000.0 / (lastTime - (lastTime = System.nanoTime())));
     }
 	//World.saveWorldtoFile();
 	GLFW.glfwTerminate();

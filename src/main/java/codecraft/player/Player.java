@@ -25,6 +25,12 @@ public class Player {
 	public static float posDY = 0;
 	public static boolean isinTheAir = true;
 	public static float rotY = 0;
+	public static Item hotBarItems[] = new Item[9];
+	static {
+		for(int i = 0; i < 9; i++) {
+			hotBarItems[i] = new ItemGrassBlock();
+		}
+	}
 	private static PlayerHitBox entityHitBox = new PlayerHitBox(0.2f,0.2f, 0.2f, -0.2f, 2, 0.2f, -0.2f, 2, -0.2f, 0.2f, 2, -0.2f,0.2f, -2, 0.2f, -0.2f, -2, 0.2f, -0.2f, -2, -0.2f, 0.2f, -2, -0.2f);
 	public static float getPosX() {
 		return posX;
@@ -62,11 +68,11 @@ public class Player {
 	public static void drawHotBars() {
 		
 		for(int i = 0; i < 9; i++) {
-			Item item = new ItemGrassBlock();
+			Item item = hotBarItems[i];
 		Vector3f color = null;
 		if(hotBarIndex == i) {
 			color=new Vector3f(1,1,1 );
-			itemInHand = item;
+			
 		}else {
 			color = new Vector3f(0,0,0 );
 		}
