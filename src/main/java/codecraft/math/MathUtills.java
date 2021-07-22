@@ -54,4 +54,12 @@ public class MathUtills {
 		
 	return new Vector3f(x - Float.valueOf(xd),y - Float.valueOf(yd),z - Float.valueOf(zd));
 	}
+	 public static int floor(float value) {
+	        int i =(int)value;
+	        if(i - value <= -0.5) {
+	        	i++;
+	        }
+	        	return i;
+	        
+	    }
 }

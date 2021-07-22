@@ -9,6 +9,7 @@ import org.lwjgl.opengl.GL11;
 import codecraft.renderEngine.Texture;
 import codecraft.renderEngine.drawList;
 import codecraft.world.Block;
+import codecraft.world.lighting.LightingController;
 
 public class BlockGrass extends Block {
 	

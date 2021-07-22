@@ -41,6 +41,7 @@ import org.lwjgl.opengl.GL30;
 
 import codecraft.entity.PlayerHitBox;
 import codecraft.entity.StaticHitBox;
+import codecraft.math.MathUtills;
 import codecraft.player.Player;
 import codecraft.ui.Text;
 import codecraft.ui.charModels.C0;
@@ -51,6 +52,7 @@ import codecraft.world.World;
 import codecraft.world.blocks.BlockGrass;
 import codecraft.world.blocks.BlockStone;
 import codecraft.world.blocks.BlockWood;
+import codecraft.world.lighting.LightingController;
 
 
 
@@ -78,16 +80,16 @@ public static void createWindowAndOpenglContext(String title, int width, int hei
 }
 public static void configureOpenGL() {
 	
-	FloatBuffer fb = BufferUtils.createFloatBuffer(16);
-    Matrix4f m = new Matrix4f();
-    m.setPerspective((float) Math.toRadians(50.0f), (float)WindowVariables.width/(float)WindowVariables.height, 0.01f,1000.0f);
+	WindowVariables.fb = BufferUtils.createFloatBuffer(16);
+	WindowVariables.m = new Matrix4f();
+	WindowVariables.m.setPerspective((float) Math.toRadians(50.0f), (float)WindowVariables.width/(float)WindowVariables.height, 0.01f,1000.0f);
     glMatrixMode(GL_PROJECTION);
-    glLoadMatrixf(m.get(fb));
-    m.setLookAt(0.0f, 0.0f, 10.0f,
+    glLoadMatrixf(WindowVariables.m.get(WindowVariables.fb));
+    WindowVariables.m.setLookAt(0.0f, 0.0f, 0.0f,
                 0.0f, 0.0f, 0.0f,
-                0.0f, 1.0f, 0.0f);
+                0.0f, 0.0f, 0.0f);
     glMatrixMode(GL_MODELVIEW);
-    glLoadMatrixf(m.get(fb));
+    glLoadMatrixf(WindowVariables.m.get(WindowVariables.fb));
     glClearColor(0.0f, 0.0f, 0.0f, 0.5f); // Black Background
 	  glClearDepth(1.0f); // Depth Buffer Setup
 	  glDepthFunc(GL_LEQUAL); // The Type Of Depth Testing (Less Or Equal)
@@ -714,26 +716,52 @@ public static void setupNextFrame(){
 	//GL11.glCullFace(GL11.GL_BACK);
 	float yawRadian = (float) ((Player.rotX) * (Math.PI/180));
 	GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
-	GL11.glClearColor(0.529f, 0.808f, 0.922f, 0.5f);
+	
+	GL11.glClearColor(0.529f*LightingController.worldLighting, 0.808f*LightingController.worldLighting, 0.922f*LightingController.worldLighting, 0.5f);
+	
 	
 	//GL11.glClearColor(0f, 0f, 0f, 0f);
+	WindowVariables.m.setLookAt(0.0f, 0.0f, 0.0f,
+            0.0f, 0.0f, 0.0f,
+            0.0f, 0.0f, 0.0f);
 	GL11.glLoadIdentity();
 	drawCrossHair();
 	Player.drawHotBars();
+	
+	Vector3f bp = getBlockPlayerIsLookingAt();
 	Text.DrawText(-0.15f, 0.08f, -0.2f, 0.5f, String.valueOf(-Player.posX));
 	Text.DrawText(-0.15f, 0.07f, -0.2f, 0.5f, String.valueOf(-Player.posY));
 	Text.DrawText(-0.15f, 0.06f, -0.2f, 0.5f, String.valueOf(-Player.posZ));
-	Text.DrawText(-0.15f, 0.05f, -0.2f, 0.5f, String.valueOf(WindowVariables.fps));
+	Text.DrawText(-0.15f, 0.05f, -0.2f, 0.5f, String.valueOf(-Player.rotX));
+	Text.DrawText(-0.15f, 0.04f, -0.2f, 0.5f, String.valueOf(-Player.rotY));
+	Text.DrawText(-0.15f, 0.03f, -0.2f, 0.5f, String.valueOf(WindowVariables.fps));
+	Text.DrawText(-0.15f, 0.02f, -0.2f, 0.5f, String.valueOf(bp.x));
+	Text.DrawText(-0.15f, 0.01f, -0.2f, 0.5f, String.valueOf(bp.y));
+	Text.DrawText(-0.15f, 0.00f, -0.2f, 0.5f, String.valueOf(bp.z));
 	
-	float pitchRadian = (float) (Player.rotY/2 * (Math.PI / 180)); // X rotation
 	
+	WindowVariables.m = WindowVariables.m.identity();
 	
-	
+	GL11.glLoadIdentity();
 	GL11.glRotatef(Player.rotX, 0.0f, 1f, 0.0f);
 	GL11.glRotatef((float) (-Player.rotY), (1 * Math.cos(yawRadian) * Math.cos(90))/360, 0.0f, (1 * Math.sin(yawRadian) * Math.cos(90))/360);
 	GL11.glRotatef(0 , 0.0f, 0.0f, 1.0f);
 	GL11.glTranslatef(Player.posX, Player.posY -1f, Player.posZ);
+	WindowVariables.m.rotate(Player.rotX, 0.0f, 1f, 0.0f);
+	WindowVariables.m.rotate((float) (-Player.rotY), (1 * Math.cos(yawRadian) * Math.cos(90))/360, 0.0f, (1 * Math.sin(yawRadian) * Math.cos(90))/360);
+	WindowVariables.m.rotate(0 , 0.0f, 0.0f, 1.0f);
+	WindowVariables.m.translate(Player.posX, Player.posY -1f, Player.posZ);
+	Vector3f v = new Vector3f(0 ,1  ,0 );
 	
+	float offset = 1f;
+	
+	
+	float xd =  MathUtills.floor(-Player.posX) + Player.posX;
+	float yd =  MathUtills.floor(-Player.posY) + Player.posY;
+	float zd =  MathUtills.floor(-Player.posZ) + Player.posZ;
+	System.out.println("xd:"+xd);
+	System.out.println("yd:"+yd);
+	System.out.println("zd:"+zd);
 	//System.out.println("pos X: " + Player.posX);
  //System.out.println("pos Y: " + Player.posY);
  //System.out.println("pos Z: " + Player.posZ);
@@ -767,93 +795,59 @@ public static void FPS(int fps, long time) throws InterruptedException {
 }
 
 public static Vector3f getBlockPlayerIsLookingAt() {
-	Block DownBlock1 = null;
-	StaticHitBox hitbox = new StaticHitBox(0.2f,0.2f, 0.2f, -0.2f, 2, 0.2f, -0.2f, 2, -0.2f, 0.2f, 2, -0.2f,0.2f, -2, 0.2f, -0.2f, -2, 0.2f, -0.2f, -2, -0.2f, 0.2f, -2, -0.2f);
-	/*
-	Block DownBlock2 = null;
-	Block DownBlock3 = null;
-	Block DownBlock4 = null;
-	Block DownBlock5 = null;
-	Block DownBlock6 = null;
-	Block DownBlock7 = null;
-	Block DownBlock8 = null;
-	Block DownBlock9 = null;
-	*/
-
-	/*
-	Block DownBlock2 = null;
-	Block DownBlock3 = null;
-	Block DownBlock4 = null;
-	Block DownBlock5 = null;
-	Block DownBlock6 = null;
-	Block DownBlock7 = null;
-	Block DownBlock8 = null;
-	Block DownBlock9 = null;
-	*/
-	int x =(int) Math.roundHalfDown(-Player.posX);
-	int y = (int) Math.roundHalfDown(-Player.posY);
-	int z = (int) Math.roundHalfDown(-Player.posZ);
-	while(true) {
-		try {
-			DownBlock1 = World.getBlockAtPos(x,y,z);
-			break;
-		}catch(Exception e){
-			y--;
-			if(y <= -1) {
-				break;
-			}
-		}
-	}
 	
-	/*
-try {
-	if(DownBlock1 != null) {
-		 DownBlock2 = World.getBlockAtPos(x +1,y,z);
-		 DownBlock3 = World.getBlockAtPos(x -1,y,z);
-	     DownBlock4 = World.getBlockAtPos(x,y,z+1);
-		 DownBlock5 = World.getBlockAtPos(x,y,-1);
-	     DownBlock6 = World.getBlockAtPos(x+1,y,z+1);
-		 DownBlock7 = World.getBlockAtPos(x+1,y,z-1);
-		 DownBlock8 = World.getBlockAtPos(x-1,y,z-1);
-		 DownBlock9 = World.getBlockAtPos(x-1,y,z+1);
-	}
-}catch(Exception e) {
-	
-}
-*/
 	float offset = 0.1f;
 	float pitchRadian = (float) (Player.rotY * (Math.PI / 180)); // X rotation
 	float yawRadian   = (float) (Player.rotX * (Math.PI / 180)); // Y rotation
 	float x2 =-Player.posX;
-	float y2 = -Player.posY+2;
+	float y2 = -Player.posY+1;
 	float z2 = -Player.posZ;
 	int tn = 0;
-Block[] DownBlocks = {DownBlock1/*,DownBlock2,DownBlock3,DownBlock4,DownBlock5,DownBlock6,DownBlock7,DownBlock8,DownBlock9*/};
-for(Block DownBlock : DownBlocks) {
-	if(DownBlock != null) {
-	while(true) {
 
+
+	while(true) {
+		Vector3f pbp = MathUtills.PlayerPositionToBlockPosition(x2, y2, z2);
+			try {
+				Block b = World.getBlockAtPos((int)pbp.x, (int)pbp.y,(int) pbp.z);
+				if(b == null) {
+					x2 += offset *  Math.sin( yawRadian ) * Math.cos( pitchRadian );
+					y2 += offset * -Math.sin( pitchRadian );
+					z2 -= (offset *  Math.cos( yawRadian ) * Math.cos( pitchRadian ));
+					tn++;
+					if(tn > 2000) {
+						x2 = 0;
+						y2 = 0;
+						z2= 0;
+						break;
+					}
+					continue;
+				}
+				x2 = pbp.x;
+				y2 = pbp.y;
+				z2 = pbp.z;
+				break;
+			}catch(Exception e){
 		
-		if(hitbox.checkCollsionWithBlock(DownBlock,x2,y,z2)) {
-			System.out.printf("%f %f %f", Math.floor(x2),Math.floor(y2),Math.floor(z2));
-			break;
-		}else {
-			x2 -= offset *  Math.sin( yawRadian ) * Math.cos( pitchRadian );
-			y2 -= offset * -Math.sin( pitchRadian );
-			z2 += (offset *  Math.cos( yawRadian ) * Math.cos( pitchRadian ));
+			x2 += offset *  Math.sin( yawRadian ) * Math.cos( pitchRadian );
+			y2 += offset * -Math.sin( pitchRadian );
+			z2 -= (offset *  Math.cos( yawRadian ) * Math.cos( pitchRadian ));
 			tn++;
-			if(tn > 100) {
+			if(tn > 2000) {
+				x2 = 0;
+				y2 = 0;
+				z2= 0;
 				break;
 			}
+			}
 		}
-}
-	}
-}
+
+	
+
 
 	
 	
 	
-	return new Vector3f(Math.floor(x2),Math.floor(y2),Math.floor(z2));
+	return new Vector3f((int)x2,(int)y2,(int)z2);
 	
 	
 }
