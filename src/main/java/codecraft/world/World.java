@@ -15,6 +15,7 @@ import codecraft.renderEngine.WindowVariables;
 import codecraft.renderEngine.drawList;
 import codecraft.world.blocks.BlockGrass;
 import codecraft.world.lighting.LightingController;
+import codecraft.world.lighting.LightingMode;
 
 public class World {
 public static Chunk chunks[][] = null;
@@ -26,7 +27,7 @@ private static int chunkNumbers[][] = new int[32][32];
 public static Texture textures = new Texture();
 public static int i = 0;
 public static int count = 0;
-
+public static LightingMode currectLM = LightingMode.world;
 public static void loadChunks(Chunk chunks[][]) {
 	World.chunks =  chunks;
 	
@@ -66,8 +67,9 @@ public static void loadChunks(Chunk chunks[][]) {
     			 
     			 while(true) {
     				 int count =0;
+    				 
     				 GL11.glNewList(displayListIndex +i, GL11.GL_COMPILE);
-    				 GL11.glColor4f(1*LightingController.worldLighting,1*LightingController.worldLighting,1*LightingController.worldLighting,0.5f);
+    				 
     				 try { 
     					 
     					 chunks[playerChunkX +x][playerChunkZ +z].DrawChunk();
@@ -76,7 +78,7 @@ public static void loadChunks(Chunk chunks[][]) {
     				 count++;
     				 
     				 i++;
-    				 GL11.glColor4f(1,1,1,0.5f);
+    				 
     				 GL11.glEndList();
     				 x++;
     				 if(x > rd) {

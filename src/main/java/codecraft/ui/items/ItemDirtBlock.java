@@ -14,12 +14,13 @@ import codecraft.ui.Item;
 import codecraft.ui.ItemType;
 import codecraft.world.Block;
 import codecraft.world.World;
+import codecraft.world.blocks.BlockDirt;
 import codecraft.world.blocks.BlockGrass;
 import codecraft.world.blocks.BlockPlank;
 import codecraft.world.lighting.LightingController;
 
-public class ItemGrassBlock extends Item {
-	public ItemGrassBlock() {
+public class ItemDirtBlock extends Item {
+	public ItemDirtBlock() {
 		itemType = ItemType.Placeable;
 	}
 	@Override
@@ -29,7 +30,7 @@ public class ItemGrassBlock extends Item {
 		return;
 	}
 	try {
-		World.SetBlockAtPosition((int)blockPosition.x, (int)blockPosition.y,(int)blockPosition.z, BlockGrass.class);
+		World.SetBlockAtPosition((int)blockPosition.x, (int)blockPosition.y,(int)blockPosition.z, BlockDirt.class);
 	} catch (InstantiationException e1) {
 		// TODO Auto-generated catch block
 		e1.printStackTrace();
@@ -99,10 +100,10 @@ public class ItemGrassBlock extends Item {
 		GL11.glEnd();
 		
 		glBegin(GL_QUADS);
-		GL11.glTexCoord2f(0.0f, 0.1f); GL11.glVertex3f(-(0.5f*size) + x, (0.5f*size) +y , -(0.5f*size) +z);	// Top Left Of The Texture and Quad
-		GL11.glTexCoord2f(0.0f, 0.0f); GL11.glVertex3f(-(0.5f*size) + x,(0.5f*size) + y ,  (0.5f*size)  +z);	// Bottom Left Of The Texture and Quad
-		GL11.glTexCoord2f(0.1f, 0.0f); GL11.glVertex3f( (0.5f*size) + x, (0.5f*size) +y ,  (0.5f*size) +z);	// Bottom Right Of The Texture and Quad
-		GL11.glTexCoord2f(0.1f, 0.1f); GL11.glVertex3f( (0.5f*size) + x, (0.5f*size) +y , -(0.5f*size) +z) ;	// Top Right Of The Texture and Quad
+		GL11.glTexCoord2f(0.0f+ 0.1f, 0.1f); GL11.glVertex3f(-(0.5f*size) + x, (0.5f*size) +y , -(0.5f*size) +z);	// Top Left Of The Texture and Quad
+		GL11.glTexCoord2f(0.0f+ 0.1f, 0.0f); GL11.glVertex3f(-(0.5f*size) + x,(0.5f*size) + y ,  (0.5f*size)  +z);	// Bottom Left Of The Texture and Quad
+		GL11.glTexCoord2f(0.1f+ 0.1f, 0.0f); GL11.glVertex3f( (0.5f*size) + x, (0.5f*size) +y ,  (0.5f*size) +z);	// Bottom Right Of The Texture and Quad
+		GL11.glTexCoord2f(0.1f+ 0.1f, 0.1f); GL11.glVertex3f( (0.5f*size) + x, (0.5f*size) +y , -(0.5f*size) +z) ;	// Top Right Of The Texture and Quad
 		// Bottom Face
 		
 		GL11.glEnd();

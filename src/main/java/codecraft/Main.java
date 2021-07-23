@@ -21,6 +21,7 @@ import codecraft.player.Player;
 import codecraft.renderEngine.PlotCell3f;
 import codecraft.renderEngine.WindowUtils;
 import codecraft.renderEngine.WindowVariables;
+import codecraft.ui.ItemType;
 import codecraft.ui.Text;
 import codecraft.world.Block;
 import codecraft.world.Chunk;
@@ -147,16 +148,28 @@ public class Main {
 		float x1 = 0* offset *  Math.sin( yawRadian ) * Math.cos( pitchRadian );
 		float y1 = 0 * offset * -Math.sin( pitchRadian );
 		float z1 = 0* -(offset *  Math.cos( yawRadian ) * Math.cos( pitchRadian ));
-		
+		float bx1 = 0 ;
+		float by1 = 0;
+		float bz1 = 0;
 		int tn = 0;
 		while(true) {
 			float x2 = x1+offset *  Math.sin( yawRadian ) * Math.cos( pitchRadian );
 			float z2 = z1 + -(offset *  Math.cos( yawRadian ) * Math.cos( pitchRadian ));
 			try {
 				Block b = World.getBlockAtPos(MathUtills.floor(x2 -Player.posX), MathUtills.floor(y1-Player.posY+1),+MathUtills.floor(z2-Player.posZ));
+				
 				if(b != null) {
+					bx1 = x2;
+					bz1 = z2;
+					if(Player.hotBarItems[Player.hotBarIndex] == null) {
+					
 					x1 = x2;
 					z1 = z2;
+					
+					}else if(!Player.hotBarItems[Player.hotBarIndex].itemType.equals(ItemType.Placeable)) {
+						x1 = x2;
+						z1 = z2;
+					}
 					break;
 				}
 
@@ -171,7 +184,15 @@ public class Main {
 			try {
 				Block b = World.getBlockAtPos(MathUtills.floor(x1 -Player.posX), MathUtills.floor(y2-Player.posY+1),+MathUtills.floor(z1-Player.posZ));
 				if(b != null) {
+					by1 = y2;
+					if(Player.hotBarItems[Player.hotBarIndex] == null) {
+					
 					y1 = y2;
+					
+					}
+					else if(!Player.hotBarItems[Player.hotBarIndex].itemType.equals(ItemType.Placeable)) {
+						y1 = y2;
+					}
 					break;
 				}
 
@@ -181,7 +202,7 @@ public class Main {
 				break;
 			}
 			y1 = y2;
-			if(tn > 5) {
+			if(tn > 3) {
 				
 				break;
 			}
@@ -191,12 +212,79 @@ public class Main {
 		
 		Block b = null;
 		try {
-			b = World.getBlockAtPos(MathUtills.floor(x1 -Player.posX), MathUtills.floor(y1-Player.posY+1),+MathUtills.floor(z1-Player.posZ));
+			b = World.getBlockAtPos(MathUtills.floor(bx1 -Player.posX), MathUtills.floor(by1-Player.posY+1),+MathUtills.floor(bz1-Player.posZ));
 		}catch(Exception e){
 			
 		}
-		if(b != null) {
-			GL11.glColor4f(1,1,1,0.5f);
+		boolean placeMode = false;;
+		boolean placeable = false;
+		if(Player.hotBarItems[Player.hotBarIndex] != null ) {
+			if(Player.hotBarItems[Player.hotBarIndex].itemType.equals(ItemType.Placeable)) {
+				placeable = true;
+			}
+		}
+		if(placeable) {
+			Block b1 = null;
+			Block b2 = null;
+			Block b3 = null;
+			Block b4 = null;
+			Block b5 = null;
+			Block b6 = null;
+			try { 
+			b1 =  World.getBlockAtPos(MathUtills.floor(bx1 -Player.posX), MathUtills.floor(by1-Player.posY+1)-1,+MathUtills.floor(bz1-Player.posZ));
+			}
+			catch(Exception e) {
+				
+			}
+			/*
+			try { 
+				b2 =  World.getBlockAtPos(MathUtills.floor(bx1 -Player.posX), MathUtills.floor(by1-Player.posY+1)+1,+MathUtills.floor(bz1-Player.posZ));
+				}
+				catch(Exception e) {
+					
+				}
+			try { 
+				b3 =  World.getBlockAtPos(MathUtills.floor(bx1 -Player.posX)+1, MathUtills.floor(by1-Player.posY+1),+MathUtills.floor(bz1-Player.posZ));
+				}
+				catch(Exception e) {
+					
+				}
+			try { 
+				b4 =  World.getBlockAtPos(MathUtills.floor(bx1 -Player.posX)-1, MathUtills.floor(by1-Player.posY+1)-1,+MathUtills.floor(bz1-Player.posZ));
+				}
+				catch(Exception e) {
+					
+				}
+			try { 
+				b5 =  World.getBlockAtPos(MathUtills.floor(bx1 -Player.posX), MathUtills.floor(by1-Player.posY+1),+MathUtills.floor(bz1-Player.posZ)+1);
+				}
+				catch(Exception e) {
+					
+				}
+			try { 
+				b6 =  World.getBlockAtPos(MathUtills.floor(bx1 -Player.posX), MathUtills.floor(by1-Player.posY+1)-1,+MathUtills.floor(bz1-Player.posZ)-1);
+				}
+				catch(Exception e) {
+					
+				}
+				*/
+				//if(b1 != null || b2 != null || b3 != null || b4 != null || b5 != null || b6 != null) {
+					
+			Player.blockSelected = new Vector3f(MathUtills.floor(x1 -Player.posX), MathUtills.floor(y1-Player.posY+1),+MathUtills.floor(z1-Player.posZ));
+					GL11.glColor4f(1,1,1,0.25f);
+					GL11.glEnable(GL11.GL_ALPHA_TEST);
+					GL11.glAlphaFunc(GL11.GL_GREATER, 0.0f);
+					GL11.glEnable(GL11.GL_BLEND);
+					GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+				new BlockGrass(MathUtills.floor(x1 -Player.posX), MathUtills.floor(y1-Player.posY+1),+MathUtills.floor(z1-Player.posZ),0,0).Draw();
+				GL11.glDisable(GL11.GL_BLEND);
+				GL11.glColor3f(1,1,1);
+				
+				//}
+		}
+		else if(b != null ) {
+			Player.blockSelected = new Vector3f(MathUtills.floor(x1 -Player.posX), MathUtills.floor(y1-Player.posY+1),+MathUtills.floor(z1-Player.posZ));
+			GL11.glColor4f(1,1,1,0.25f);
 			GL11.glEnable(GL11.GL_ALPHA_TEST);
 			GL11.glAlphaFunc(GL11.GL_GREATER, 0.0f);
 			GL11.glEnable(GL11.GL_BLEND);
@@ -204,6 +292,8 @@ public class Main {
 		new BlockGrass(MathUtills.floor(x1 -Player.posX), MathUtills.floor(y1-Player.posY+1),+MathUtills.floor(z1-Player.posZ),0,0).Draw();
 		GL11.glDisable(GL11.GL_BLEND);
 		GL11.glColor3f(1,1,1);
+		}else {
+			Player.blockSelected = null;
 		}
 		Vector3f d = new Vector3f();
 		/*

@@ -5,7 +5,12 @@ import org.lwjgl.opengl.GL11;
 
 import codecraft.entity.PlayerHitBox;
 import codecraft.ui.Item;
+import codecraft.ui.items.ItemDirtBlock;
 import codecraft.ui.items.ItemGrassBlock;
+import codecraft.ui.items.ItemLeaveBlock;
+import codecraft.ui.items.ItemPlankBlock;
+import codecraft.ui.items.ItemStoneBlock;
+import codecraft.ui.items.ItemWoodBlock;
 
 public class Player {
 	public static float posX = -1;
@@ -26,10 +31,15 @@ public class Player {
 	public static boolean isinTheAir = true;
 	public static float rotY = 0;
 	public static Item hotBarItems[] = new Item[9];
+	public static Vector3f blockSelected = new Vector3f(0,0,0);
 	static {
-		for(int i = 0; i < 9; i++) {
-			hotBarItems[i] = new ItemGrassBlock();
-		}
+		
+		hotBarItems[0] = new ItemGrassBlock();
+		hotBarItems[1] = new ItemDirtBlock();
+		hotBarItems[2] = new ItemStoneBlock();
+		hotBarItems[3] = new ItemWoodBlock();
+		hotBarItems[4] = new ItemLeaveBlock();
+		hotBarItems[5] = new ItemPlankBlock();
 	}
 	private static PlayerHitBox entityHitBox = new PlayerHitBox(0.2f,0.2f, 0.2f, -0.2f, 2, 0.2f, -0.2f, 2, -0.2f, 0.2f, 2, -0.2f,0.2f, -2, 0.2f, -0.2f, -2, 0.2f, -0.2f, -2, -0.2f, 0.2f, -2, -0.2f);
 	public static float getPosX() {
@@ -117,7 +127,9 @@ public class Player {
 		
 		GL11.glColor3f(1, 1, 1);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
+		if(item != null) {
 		item.draw(x, y, z, 0.01f);
+		}
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 	}
 

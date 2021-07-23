@@ -190,6 +190,70 @@ public static void showBlockWherePlayerIsLookin() {
 	 
 }
 public static void CheckKeys()  {
+	if(WindowVariables.pressedRightClick) {
+		if(Player.hotBarItems[Player.hotBarIndex] != null) {
+	Player.hotBarItems[Player.hotBarIndex].action();
+		}
+	WindowVariables.pressedRightClick = false;
+	}
+	if(WindowVariables.pressedLeftClick) {
+		if(Player.hotBarItems[Player.hotBarIndex] == null) {
+			Vector3f blockPosition = Player.blockSelected;
+			if(blockPosition == null) {
+				return;
+			}
+			try {
+				World.SetBlockAtPosition((int)blockPosition.x, (int)blockPosition.y,(int)blockPosition.z, null);
+			} catch (InstantiationException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (IllegalAccessException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (IllegalArgumentException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (InvocationTargetException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (SecurityException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			int chunkXpos = (int)blockPosition.x;
+			 int chunkX;
+			 while(true) {
+				 if(chunkXpos % 16 == 0) {
+					 break;
+				 }
+				chunkXpos--;
+			 }
+			 chunkX = chunkXpos/16;
+			 
+			 
+			 int chunkZpos = (int)blockPosition.z;
+			 int chunkZ;
+			 while(true) {
+				 if(chunkZpos % 16 == 0) {
+					 break;
+				 }
+				chunkZpos--;
+			 }
+			 chunkZ = chunkZpos/16;
+			 int i;
+			 try {
+			 i = World.ChunkPositonToChunkNumber(chunkX, chunkZ);
+			 GL11.glNewList(World.displayListIndex +i, GL11.GL_COMPILE);
+			 GL11.glColor4f(1*LightingController.worldLighting+0.2f,1*LightingController.worldLighting+0.3f,1*LightingController.worldLighting+0.3f,0.5f);
+			 World.chunks[chunkX][chunkZ].DrawChunk();
+			 GL11.glEndList();
+			 }catch(Exception e) {
+				 
+			 }
+			}
+		
+	WindowVariables.pressedLeftClick = false;
+	}
 	if(GLFW.glfwGetKey(WindowVariables.window, GLFW.GLFW_KEY_UP)== GLFW.GLFW_PRESS) {
 		if(!Player.pu) {
 		Player.placeBlockOffsetY++;
@@ -727,30 +791,27 @@ public static void setupNextFrame(){
 	GL11.glLoadIdentity();
 	drawCrossHair();
 	Player.drawHotBars();
-	
-	Vector3f bp = getBlockPlayerIsLookingAt();
+	GL11.glRotated(10, 1, 0, 0);
+	drawHand(+0.2f, -0.18f, 0f);
+	GL11.glRotated(-10, 1, 0, 0);
+
 	Text.DrawText(-0.15f, 0.08f, -0.2f, 0.5f, String.valueOf(-Player.posX));
 	Text.DrawText(-0.15f, 0.07f, -0.2f, 0.5f, String.valueOf(-Player.posY));
 	Text.DrawText(-0.15f, 0.06f, -0.2f, 0.5f, String.valueOf(-Player.posZ));
 	Text.DrawText(-0.15f, 0.05f, -0.2f, 0.5f, String.valueOf(-Player.rotX));
 	Text.DrawText(-0.15f, 0.04f, -0.2f, 0.5f, String.valueOf(-Player.rotY));
 	Text.DrawText(-0.15f, 0.03f, -0.2f, 0.5f, String.valueOf(WindowVariables.fps));
-	Text.DrawText(-0.15f, 0.02f, -0.2f, 0.5f, String.valueOf(bp.x));
-	Text.DrawText(-0.15f, 0.01f, -0.2f, 0.5f, String.valueOf(bp.y));
-	Text.DrawText(-0.15f, 0.00f, -0.2f, 0.5f, String.valueOf(bp.z));
 	
 	
-	WindowVariables.m = WindowVariables.m.identity();
 	
-	GL11.glLoadIdentity();
+	
+	
+	
 	GL11.glRotatef(Player.rotX, 0.0f, 1f, 0.0f);
 	GL11.glRotatef((float) (-Player.rotY), (1 * Math.cos(yawRadian) * Math.cos(90))/360, 0.0f, (1 * Math.sin(yawRadian) * Math.cos(90))/360);
 	GL11.glRotatef(0 , 0.0f, 0.0f, 1.0f);
 	GL11.glTranslatef(Player.posX, Player.posY -1f, Player.posZ);
-	WindowVariables.m.rotate(Player.rotX, 0.0f, 1f, 0.0f);
-	WindowVariables.m.rotate((float) (-Player.rotY), (1 * Math.cos(yawRadian) * Math.cos(90))/360, 0.0f, (1 * Math.sin(yawRadian) * Math.cos(90))/360);
-	WindowVariables.m.rotate(0 , 0.0f, 0.0f, 1.0f);
-	WindowVariables.m.translate(Player.posX, Player.posY -1f, Player.posZ);
+	
 	Vector3f v = new Vector3f(0 ,1  ,0 );
 	
 	float offset = 1f;
@@ -851,6 +912,55 @@ public static Vector3f getBlockPlayerIsLookingAt() {
 	
 	
 }
-
+private static void drawHand(float x, float y,float z) {
+	GL11.glColor3f((210.0f/255.0f)*LightingController.worldLighting +(0.3f * ((210.0f/255.0f))), (180.0f/255.0f)*LightingController.worldLighting+(0.3f*(180.0f/255.0f)), (140.0f/255.0f)*LightingController.worldLighting+(0.3f*(140.0f/255.0f)));
+	
+	
+	GL11.glBegin(GL11.GL_QUADS);
+	GL11.glVertex3f(x+0.125f/4.0f, y+0.125f/4.0f, z -0.5f);
+	GL11.glVertex3f(x-0.125f/4.0f, y+0.125f/4.0f, z-0.5f);
+	GL11.glVertex3f(x-0.125f/4.0f, y-0.125f/4.0f, z-0.5f);
+	GL11.glVertex3f(x+0.125f/4.0f, y-0.125f/4.0f, z-0.5f);
+	GL11.glEnd();
+	
+	
+	GL11.glBegin(GL11.GL_QUADS);
+	GL11.glVertex3f(x+0.125f/4.0f, y+0.125f/4.0f, z+0.5f);
+	GL11.glVertex3f(x-0.125f/4.0f, y+0.125f/4.0f, z+0.5f);
+	GL11.glVertex3f(x-0.125f/4.0f, y-0.125f/4.0f, z+0.5f);
+	GL11.glVertex3f(x+0.125f/4.0f, y-0.125f/4.0f, z+0.5f);
+	GL11.glEnd();
+	
+	
+	GL11.glBegin(GL11.GL_QUADS);
+	GL11.glVertex3f(x-0.125f/4.0f, y+0.125f/4.0f, z+0.5f);
+	GL11.glVertex3f(x-0.125f/4.0f, y-0.125f/4.0f, z+0.5f);
+	GL11.glVertex3f(x-0.125f/4.0f, y-0.125f/4.0f, z-0.5f);
+	GL11.glVertex3f(x-0.125f/4.0f, y+0.125f/4.0f, z-0.5f);
+	GL11.glEnd();
+	
+	
+	GL11.glBegin(GL11.GL_QUADS);
+	GL11.glVertex3f(x+0.125f/4.0f, y+0.125f/4.0f, z+0.5f);
+	GL11.glVertex3f(x+0.125f/4.0f, y-0.125f/4.0f, z+0.5f);
+	GL11.glVertex3f(x+0.125f/4.0f, y-0.125f/4.0f, z-0.5f);
+	GL11.glVertex3f(x+0.125f/4.0f, y+0.125f/4.0f, z-0.5f);
+	GL11.glEnd();
+	
+	
+	GL11.glBegin(GL11.GL_QUADS);
+	GL11.glVertex3f(x+0.125f/4.0f, y-0.125f/4.0f, z+0.5f);
+	GL11.glVertex3f(x-0.125f/4.0f, y-0.125f/4.0f, z+0.5f);
+	GL11.glVertex3f(x-0.125f/4.0f, y-0.125f/4.0f, z-0.5f);
+	GL11.glVertex3f(x+0.125f/4.0f, y-0.125f/4.0f, z-0.5f);
+	GL11.glEnd();
+	
+	GL11.glBegin(GL11.GL_QUADS);
+	GL11.glVertex3f(x+0.125f/4.0f, y+0.125f/4.0f, z+0.5f);
+	GL11.glVertex3f(x-0.125f/4.0f, y+0.125f/4.0f, z+0.5f);
+	GL11.glVertex3f(x-0.125f/4.0f, y+0.125f/4.0f, z-0.5f);
+	GL11.glVertex3f(x+0.125f/4.0f, y+0.125f/4.0f, z-0.5f);
+	GL11.glEnd();
+}
 
 }
