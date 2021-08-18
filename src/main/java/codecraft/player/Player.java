@@ -17,7 +17,7 @@ public class Player {
 	public static float posY = -1000;
 	public static float posZ = -5;
 	public static float OldposX = -1;
-	public static float OldposY = -1000;
+	public static float OldposY = -100;
 	public static float OldposZ = -5;
 	public static Item itemInHand = null;
 	public static int hotBarIndex = 0;

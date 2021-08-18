@@ -1,6 +1,7 @@
 package codecraft.renderEngine;
 
 import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.GL30;
 
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
@@ -26,13 +27,14 @@ public class Texture {
         //Generate Texture on GPU
         texID = glGenTextures();
         glBindTexture(GL_TEXTURE_2D, texID);
-
+        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL30.GL_CLAMP_TO_EDGE );
+        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL30.GL_CLAMP_TO_EDGE );
         //Set texture Parameters
      
         //when shrinking, pixelate
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
+        //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         IntBuffer width = BufferUtils.createIntBuffer(1);
         IntBuffer height = BufferUtils.createIntBuffer(1);
         IntBuffer channels = BufferUtils.createIntBuffer(1);
@@ -55,10 +57,12 @@ public class Texture {
 
     }
     public void bind(){
+    	GL30.glActiveTexture(GL30.GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D,texID);
     }
 
     public void unbind(){
+    	
         glBindTexture(GL_TEXTURE_2D,0);
     }
 

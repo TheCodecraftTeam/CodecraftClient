@@ -1,0 +1,523 @@
+/* vi:set filetype=glsl ts=4 sw=4: */
+#version 120
+#extension GL_ARB_gpu_shader5 : enable
+
+#define M_PI	3.1415926
+
+#define INIT_EVERYTHING
+#define USE_XFORM
+#define OBJ_LINE_WIDTH	16.0
+
+struct Ray {
+	vec3 origin, dir;
+};
+
+struct Material {
+	vec3 diffuse, specular;
+	float shininess;
+	vec4 megatex_rect;
+	float reflectivity;
+};
+
+struct HitPoint {
+	float dist;
+	vec3 pos, normal;
+	vec2 texcoord;
+	struct Material mat;
+};
+
+struct Sphere {
+	float index;
+	vec3 pos;
+	float radius;
+	struct Material mat;
+};
+
+struct Plane {
+	float index;
+	vec3 normal;
+	float dist;
+	struct Material mat;
+};
+
+struct Box {
+	float index;
+	vec3 min, max;
+	struct Material mat;
+};
+
+struct Light {
+	vec3 pos, color;
+};
+
+vec3 shade(in Ray ray, in HitPoint hit);
+bool find_intersection(in Ray ray, out HitPoint hit);
+bool sphere_intersect(in Sphere sph, in Ray ray, out HitPoint pt);
+bool plane_intersect(in Plane plane, in Ray ray, out HitPoint pt);
+bool box_intersect(in Box box, in Ray ray, out HitPoint pt);
+vec3 transform(in vec3 v, in mat4 inv_xform);
+Ray transform(in Ray ray, in mat4 xform, in mat4 inv_xform);
+Ray get_primary_ray();
+
+Sphere read_sphere(in float idx);
+Plane read_plane(in float idx);
+Box read_box(in float idx);
+Material read_material(in sampler2D tex, in float ty);
+void read_xform(in float idx, out mat4 xform, out mat4 inv_xform);
+
+uniform sampler2D tex_raydir;
+uniform sampler2D tex_spheres, tex_planes, tex_boxes;
+uniform sampler2D tex_megatex;
+uniform sampler2D tex_xforms;
+uniform samplerCube tex_env;
+uniform vec2 fog;
+
+uniform Light lights[8];
+uniform int num_lights;
+
+int num_spheres, num_planes, num_boxes;
+float sph_tex_sz, plane_tex_sz, box_tex_sz, xform_tex_sz;
+
+#ifdef INIT_EVERYTHING
+Material default_material;
+#endif
+
+void main()
+{
+#ifdef INIT_EVERYTHING
+	default_material.diffuse = default_material.specular = vec3(0.0, 0.0, 0.0);
+	default_material.shininess = 1.0;
+	default_material.reflectivity = 0.0;
+	default_material.megatex_rect = vec4(0.0, 0.0, 0.0, 0.0);
+#endif
+
+	Ray ray = get_primary_ray();
+
+	/* read the various descriptors specifying dimensions and counts for
+	 * all the relevant data textures
+	 */
+	vec4 desc = texture2D(tex_spheres, vec2(0.0, 0.0));
+	num_spheres = int(desc.x);
+	sph_tex_sz = desc.y;
+
+	desc = texture2D(tex_planes, vec2(0.0, 0.0));
+	num_planes = int(desc.x);
+	plane_tex_sz = desc.y;
+
+	desc = texture2D(tex_boxes, vec2(0.0, 0.0));
+	num_boxes = int(desc.x);
+	box_tex_sz = desc.y;
+
+	xform_tex_sz = texture2D(tex_xforms, vec2(0.0, 0.0)).x;
+
+
+	HitPoint hit;
+#ifdef INIT_EVERYTHING
+	hit.dist = 0.0;
+	hit.pos = hit.normal = vec3(0.0, 0.0, 0.0);
+#endif
+
+	vec3 color = vec3(0.0, 0.0, 0.0);
+	float energy = 1.0;
+
+	int iter = 0;
+	while(energy > 0.01 && iter++ < 4) {
+		vec3 envcol = textureCube(tex_env, ray.dir).xyz;
+
+		if(find_intersection(ray, hit)) {
+			float fog_t = clamp((hit.dist - fog.x) / (fog.y - fog.x), 0.0, 1.0);
+			color += mix(shade(ray, hit), envcol, fog_t) * energy;
+			energy *= hit.mat.reflectivity * (1.0 - fog_t);
+			ray.origin = hit.pos;
+			ray.dir = reflect(ray.dir, hit.normal);
+		} else {
+			color += envcol * energy;
+			energy = 0.0;
+			iter = 100;
+		}
+	}
+
+	gl_FragColor.xyz = color;
+	gl_FragColor.w = 1.0;
+}
+
+vec3 shade(in Ray ray, in HitPoint hit)
+{
+	vec3 normal = faceforward(hit.normal, ray.dir, hit.normal);
+
+	vec3 vdir = normalize(ray.dir);
+	vec3 vref = reflect(vdir, normal);
+
+	/* if there's no texture rect.zw will be (0, 0, 0, 0) so this will map onto
+	 * the top-left 1x1 null texture which is all white (having no effect)
+	 */
+	vec2 tc = mod(hit.texcoord, vec2(1.0, 1.0)) * hit.mat.megatex_rect.zw + hit.mat.megatex_rect.xy;
+
+	vec3 diffuse_color = hit.mat.diffuse * texture2D(tex_megatex, tc).xyz;
+
+	vec3 color = vec3(1.0, 1.0, 1.0);
+	for(int i=0; i<num_lights; i++) {
+		Ray shadow_ray;
+		shadow_ray.origin = hit.pos;
+		shadow_ray.dir = lights[i].pos - hit.pos;
+
+		HitPoint shadow_hit;
+		if(!find_intersection(shadow_ray, shadow_hit) || shadow_hit.dist > 1.0) {
+			vec3 ldir = normalize(shadow_ray.dir);
+
+			float diffuse = max(dot(ldir, normal), 0.0);
+			float specular = pow(max(dot(ldir, vref), 0.0), hit.mat.shininess);
+
+			color += (diffuse_color * diffuse + hit.mat.specular * specular) * lights[i].color;
+		}
+	}
+
+	return color;
+}
+
+bool find_intersection(in Ray ray, out HitPoint hit)
+{
+	hit.dist = 100000.0;
+#ifdef INIT_EVERYTHING
+	hit.pos = hit.normal = vec3(0.0, 0.0, 0.0);
+	hit.mat = default_material;
+	hit.texcoord = vec2(0.0, 0.0);
+#endif
+	bool found = false;
+
+	for(int i=0; i<num_spheres; i++) {
+		Sphere sph = read_sphere(i);
+
+		HitPoint tmphit;
+		if(sphere_intersect(sph, ray, tmphit) && tmphit.dist < hit.dist) {
+			hit = tmphit;
+			found = true;
+		}
+	}
+
+	for(int i=0; i<num_planes; i++) {
+		Plane plane = read_plane(i);
+
+		HitPoint tmphit;
+		if(plane_intersect(plane, ray, tmphit) && tmphit.dist < hit.dist) {
+			hit = tmphit;
+			found = true;
+		}
+	}
+
+	for(int i=0; i<num_boxes; i++) {
+		Box box = read_box(i);
+
+		HitPoint tmphit;
+		if(box_intersect(box, ray, tmphit) && tmphit.dist < hit.dist) {
+			hit = tmphit;
+			found = true;
+		}
+	}
+
+	return found;
+}
+
+#define EPSILON	1e-4
+#define SQ(x)	((x) * (x))
+
+bool sphere_intersect(in Sphere sph, in Ray inray, out HitPoint pt)
+{
+#ifdef USE_XFORM
+	mat4 xform, inv_xform;
+	read_xform(sph.index, xform, inv_xform);
+
+	Ray ray = transform(inray, inv_xform, xform);
+#else
+	Ray ray = inray;
+#endif
+
+#ifdef INIT_EVERYTHING
+	pt.dist = 0.0;
+	pt.pos = pt.normal = vec3(0.0, 0.0, 0.0);
+	pt.mat = default_material;
+	pt.texcoord = vec2(0.0, 0.0);
+#endif
+
+	float a = dot(ray.dir, ray.dir);
+	float b = dot(ray.dir, ray.origin - sph.pos) * 2.0;
+	float c = dot(ray.origin, ray.origin) + dot(sph.pos, sph.pos) -
+		2.0 * dot(ray.origin, sph.pos) - sph.radius * sph.radius;
+
+	float discr = b * b - 4.0 * a * c;
+	if(discr < EPSILON)
+		return false;
+
+	float sqrt_discr = sqrt(discr);
+	float t0 = (-b + sqrt_discr) / (2.0 * a);
+	float t1 = (-b - sqrt_discr) / (2.0 * a);
+
+	if(t0 < EPSILON)
+		t0 = t1;
+	if(t1 < EPSILON)
+		t1 = t0;
+
+	float t = min(t0, t1);
+	if(t < EPSILON)
+		return false;
+
+	// fill the HitPoint structure
+	pt.dist = t;
+	pt.pos = ray.origin + ray.dir * t;
+	pt.normal = (pt.pos - sph.pos) / sph.radius;
+	pt.mat = sph.mat;
+
+	pt.texcoord.x = 0.5 * atan(pt.normal.z, pt.normal.x) / M_PI + 0.5;
+	pt.texcoord.y = acos(pt.normal.y) / M_PI;
+
+#ifdef USE_XFORM
+	pt.pos = (xform * vec4(pt.pos, 1.0)).xyz;
+	pt.normal = normalize(transform(pt.normal, xform));
+#endif
+	return true;
+}
+
+bool plane_intersect(in Plane plane, in Ray inray, out HitPoint pt)
+{
+#ifdef USE_XFORM
+	mat4 xform, inv_xform;
+	read_xform(plane.index, xform, inv_xform);
+
+	Ray ray = transform(inray, inv_xform, xform);
+#else
+	Ray ray = inray;
+#endif
+
+#ifdef INIT_EVERYTHING
+	pt.dist = 0.0;
+	pt.pos = pt.normal = vec3(0.0, 0.0, 0.0);
+	pt.mat = default_material;
+	pt.texcoord = vec2(0.0, 0.0);
+#endif
+
+	float ndotdir = dot(plane.normal, ray.dir);
+	if(abs(ndotdir) < EPSILON) {
+		return false;
+	}
+
+	vec3 planept = plane.normal * plane.dist;
+	vec3 pptdir = planept - ray.origin;
+
+	float t = dot(plane.normal, pptdir) / ndotdir;
+	if(t < EPSILON) {
+		return false;
+	}
+
+	pt.dist = t;
+	pt.pos = ray.origin + ray.dir * t;
+	pt.normal = plane.normal;
+	pt.mat = plane.mat;
+	pt.texcoord.x = pt.pos.x;
+	pt.texcoord.y = pt.pos.z;
+
+#ifdef USE_XFORM
+	pt.pos = (xform * vec4(pt.pos, 1.0)).xyz;
+	pt.normal = normalize(transform(pt.normal, xform));
+#endif
+	return true;
+}
+
+bool box_intersect(in Box box, in Ray inray, out HitPoint pt)
+{
+#ifdef USE_XFORM
+	mat4 xform, inv_xform;
+	read_xform(box.index, xform, inv_xform);
+
+	Ray ray = transform(inray, inv_xform, xform);
+#else
+	Ray ray = inray;
+#endif
+
+#ifdef INIT_EVERYTHING
+	pt.dist = 0.0;
+	pt.pos = pt.normal = vec3(0.0, 0.0, 0.0);
+	pt.mat = default_material;
+	pt.texcoord = vec2(0.0, 0.0);
+#endif
+
+	vec3 param[2];
+	param[0] = box.min;
+	param[1] = box.max;
+
+	vec3 inv_dir = 1.0 / ray.dir;
+	int sgn[3];
+	sgn[0] = inv_dir.x < 0.0 ? 1 : 0;
+	sgn[1] = inv_dir.y < 0.0 ? 1 : 0;
+	sgn[2] = inv_dir.z < 0.0 ? 1 : 0;
+
+	float tmin = (param[sgn[0]].x - ray.origin.x) * inv_dir.x;
+	float tmax = (param[1 - sgn[0]].x - ray.origin.x) * inv_dir.x;
+	float tymin = (param[sgn[1]].y - ray.origin.y) * inv_dir.y;
+	float tymax = (param[1 - sgn[1]].y - ray.origin.y) * inv_dir.y;
+
+	pt.normal = vec3(ray.origin.x > 0.0 ? 1.0 : -1.0, 0.0, 0.0);
+
+	if(tmin > tymax || tymin > tmax) {
+		return false;
+	}
+	if(tymin > tmin) {
+		pt.normal = vec3(0.0, ray.origin.y > 0.0 ? 1.0 : -1.0, 0.0);
+		tmin = tymin;
+	}
+	if(tymax < tmax) {
+		tmax = tymax;
+	}
+
+	float tzmin = (param[sgn[2]].z - ray.origin.z) * inv_dir.z;
+	float tzmax = (param[1 - sgn[2]].z - ray.origin.z) * inv_dir.z;
+
+	if(tmin > tzmax || tzmin > tmax) {
+		return false;
+	}
+	if(tzmin > tmin) {
+		pt.normal = vec3(0.0, 0.0, ray.origin.z > 0.0 ? 1.0 : -1.0);
+		tmin = tzmin;
+	}
+	if(tzmax < tmax) {
+		tmax = tzmax;
+	}
+
+	float t = tmin < EPSILON ? tmax : tmin;
+	if(t >= 1e-4) {
+		pt.dist = t;
+		pt.pos = ray.origin + ray.dir * t;
+		pt.mat = box.mat;
+
+		float min_dist = 10000.0;
+
+		vec3 offs = box.min + (box.max - box.min) / 2.0;
+		vec3 local_pt = pt.pos - offs;
+
+		vec3 dist = abs((box.max - offs) - abs(local_pt));
+		if(dist.x < min_dist) {
+			min_dist = dist.x;
+			pt.normal = sign(local_pt.x) * vec3(1.0, 0.0, 0.0);
+			pt.texcoord = pt.pos.zy;
+		}
+		if(dist.y < min_dist) {
+			min_dist = dist.y;
+			pt.normal = sign(local_pt.y) * vec3(0.0, 1.0, 0.0);
+			pt.texcoord = pt.pos.xz;
+		}
+		if(dist.z < min_dist) {
+			pt.normal = sign(local_pt.y) * vec3(0.0, 0.0, 1.0);
+			pt.texcoord = pt.pos.xy;
+		}
+
+
+#ifdef USE_XFORM
+		pt.pos = (xform * vec4(pt.pos, 1.0)).xyz;
+		pt.normal = normalize(transform(pt.normal, xform));
+#endif
+		return true;
+	}
+	return false;
+}
+
+vec3 transform(in vec3 v, in mat4 xform)
+{
+	return mat3(xform) * v;
+}
+
+Ray transform(in Ray ray, in mat4 xform, in mat4 inv_xform)
+{
+	Ray res;
+	res.origin = (xform * vec4(ray.origin, 1.0)).xyz;
+	res.dir = transform(ray.dir, xform);
+	return res;
+}
+
+Ray get_primary_ray()
+{
+	Ray ray;
+	ray.origin = (gl_ModelViewMatrix * vec4(0.0, 0.0, 0.0, 1.0)).xyz;
+	vec3 dir = texture2D(tex_raydir, gl_TexCoord[0].st).xyz;
+	ray.dir = normalize(gl_NormalMatrix * dir);
+	return ray;
+}
+
+#define ITEM(x)	((float(x) + 0.5) / OBJ_LINE_WIDTH)
+
+Sphere read_sphere(in float idx)
+{
+	Sphere sph;
+	// +1 because the first scanline is the descriptor
+	float ty = (idx + 1.0) / sph_tex_sz;
+
+	sph.index = texture2D(tex_spheres, vec2(ITEM(0), ty)).x;
+
+	vec4 texel = texture2D(tex_spheres, vec2(ITEM(1), ty));
+	sph.pos = texel.xyz;
+	sph.radius = texel.w;
+
+	sph.mat = read_material(tex_spheres, ty);
+	return sph;
+}
+
+Plane read_plane(in float idx)
+{
+	Plane plane;
+	// +1 (see above)
+	float ty = (idx + 1.0) / plane_tex_sz;
+
+	plane.index = texture2D(tex_planes, vec2(ITEM(0), ty)).x;
+
+	vec4 texel = texture2D(tex_planes, vec2(ITEM(1), ty));
+	plane.normal = texel.xyz;
+	plane.dist = texel.w;
+
+	plane.mat = read_material(tex_planes, ty);
+	return plane;
+}
+
+Box read_box(in float idx)
+{
+	Box box;
+	float ty = (idx + 1.0) / box_tex_sz;
+
+	box.index = texture2D(tex_boxes, vec2(ITEM(0), ty)).x;
+
+	box.min = texture2D(tex_boxes, vec2(ITEM(1), ty)).xyz;
+	box.max = texture2D(tex_boxes, vec2(ITEM(2), ty)).xyz;
+
+	box.mat = read_material(tex_boxes, ty);
+	return box;
+}
+
+void read_xform(in float idx, out mat4 xform, out mat4 inv_xform)
+{
+	float ty = (idx + 1.0) / xform_tex_sz;
+
+	for(int i=0; i<4; i++) {
+		xform[i] = texture2D(tex_xforms, vec2(ITEM(i), ty));
+	}
+	inv_xform = inverse(xform);
+	/*for(int i=0; i<4; i++) {
+		inv_xform[i] = texture2D(tex_xforms, vec2(ITEM(float(i) + 4.0), ty));
+	}*/
+}
+
+#define MAT_START	4
+Material read_material(in sampler2D tex, in float ty)
+{
+	Material mat;
+
+	vec4 texel = texture2D(tex, vec2(ITEM(MAT_START), ty));
+	mat.diffuse = texel.xyz;
+
+	texel = texture2D(tex, vec2(ITEM(MAT_START + 1), ty));
+	mat.specular = texel.xyz;
+	mat.shininess = texel.w;
+
+	texel = texture2D(tex, vec2(ITEM(MAT_START + 2), ty));
+	mat.reflectivity = texel.x;
+
+	mat.megatex_rect = texture2D(tex, vec2(ITEM(MAT_START + 3), ty));
+
+	return mat;
+}

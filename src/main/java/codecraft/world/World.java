@@ -10,6 +10,7 @@ import org.lwjgl.opengl.GL11;
 
 import codecraft.player.Player;
 import codecraft.renderEngine.Texture;
+import codecraft.renderEngine.TexturePNG;
 import codecraft.renderEngine.WindowUtils;
 import codecraft.renderEngine.WindowVariables;
 import codecraft.renderEngine.drawList;
@@ -25,9 +26,17 @@ public static int rd = 2;
 public static int nrd = -rd;
 private static int chunkNumbers[][] = new int[32][32];
 public static Texture textures = new Texture();
+public static TexturePNG texturesPNG = new TexturePNG();
 public static int i = 0;
 public static int count = 0;
 public static LightingMode currectLM = LightingMode.world;
+
+public static Texture skyBox1 = new Texture();
+public static Texture skyBox2 = new Texture();
+public static Texture skyBox3 = new Texture();
+public static Texture skyBox4 = new Texture();
+public static Texture skyBox5 = new Texture();
+public static Texture skyBox6 = new Texture();
 public static void loadChunks(Chunk chunks[][]) {
 	World.chunks =  chunks;
 	
@@ -69,7 +78,7 @@ public static void loadChunks(Chunk chunks[][]) {
     				 int count =0;
     				 
     				 GL11.glNewList(displayListIndex +i, GL11.GL_COMPILE);
-    				 
+    				 textures.bind();
     				 try { 
     					 
     					 chunks[playerChunkX +x][playerChunkZ +z].DrawChunk();
@@ -95,6 +104,7 @@ public static void loadChunks(Chunk chunks[][]) {
 }
 public static void drawWorld() {
 	GL11.glEnable(GL11.GL_TEXTURE_2D);
+	textures.bind();
 	//WindowUtils.showBlockWherePlayerIsLookin();
 	for(int i = 0; i <=World.i; i++) {
 	GL11.glCallList(displayListIndex + i);
@@ -205,5 +215,50 @@ for(Chunk[] Chunks : chunks) {
 
 cfr.close();
 }
+public static void DrawSkyBox() {
+	skyBox1.bind();
+	GL11.glBegin(GL11.GL_QUADS);
+		GL11.glTexCoord2f(0, 0);GL11.glVertex3f(-50000 + -Player.posX, 50000-Player.posY,-50000 + -Player.posZ);
+		GL11.glTexCoord2f(1, 0);GL11.glVertex3f(50000 + -Player.posX, 50000-Player.posY,-50000 +- Player.posZ);
+		GL11.glTexCoord2f(1, 1);GL11.glVertex3f(50000 +- Player.posX, 50000-Player.posY,50000 + -Player.posZ);
+		GL11.glTexCoord2f(0, 1);GL11.glVertex3f(-50000 + -Player.posX, 50000-Player.posY,50000 + -Player.posZ);
+	GL11.glEnd();
+	
+	//skyBox4.bind();
+GL11.glBegin(GL11.GL_QUADS);
+	GL11.glTexCoord2f(0, 0);GL11.glVertex3f(50000 + -Player.posX, -50000-Player.posY,-50000 + -Player.posZ);
+	GL11.glTexCoord2f(1, 0);GL11.glVertex3f(50000 + -Player.posX, 50000-Player.posY,-50000 +- Player.posZ);
+	GL11.glTexCoord2f(1, 1);GL11.glVertex3f(50000 +- Player.posX, 50000-Player.posY,50000 + -Player.posZ);
+	GL11.glTexCoord2f(0, 1);GL11.glVertex3f(50000 + -Player.posX, -50000-Player.posY,50000 + -Player.posZ);
+GL11.glEnd();
+//skyBox3.bind();
+GL11.glBegin(GL11.GL_QUADS);
+GL11.glTexCoord2f(0, 0);GL11.glVertex3f(-50000 + -Player.posX, -50000-Player.posY,-50000 + -Player.posZ);
+GL11.glTexCoord2f(1, 0);GL11.glVertex3f(-50000 + -Player.posX, 50000-Player.posY,-50000 +- Player.posZ);
+GL11.glTexCoord2f(1, 1);GL11.glVertex3f(-50000 +- Player.posX, 50000-Player.posY,50000 + -Player.posZ);
+GL11.glTexCoord2f(0, 1);GL11.glVertex3f(-50000 + -Player.posX, -50000-Player.posY,50000 + -Player.posZ);
+GL11.glEnd();
 
+//skyBox5.bind();
+GL11.glBegin(GL11.GL_QUADS);
+GL11.glTexCoord2f(0, 0);GL11.glVertex3f(-50000 + -Player.posX, -50000-Player.posY,50000 + -Player.posZ);
+GL11.glTexCoord2f(1, 0);GL11.glVertex3f(50000 + -Player.posX, -50000-Player.posY,50000 +- Player.posZ);
+GL11.glTexCoord2f(1, 1);GL11.glVertex3f(50000 +- Player.posX, 50000-Player.posY,50000 + -Player.posZ);
+GL11.glTexCoord2f(0, 1);GL11.glVertex3f(-50000 + -Player.posX, 50000-Player.posY,50000 + -Player.posZ);
+GL11.glEnd();
+//skyBox6.bind();
+GL11.glBegin(GL11.GL_QUADS);
+GL11.glTexCoord2f(0, 0);GL11.glVertex3f(-50000 + -Player.posX, -50000-Player.posY,-50000 + -Player.posZ);
+GL11.glTexCoord2f(1, 0);GL11.glVertex3f(50000 + -Player.posX, -50000-Player.posY,-50000 +- Player.posZ);
+GL11.glTexCoord2f(1, 1);GL11.glVertex3f(50000 +- Player.posX, 50000-Player.posY,-50000 + -Player.posZ);
+GL11.glTexCoord2f(0, 1);GL11.glVertex3f(-50000 + -Player.posX, 50000-Player.posY,-50000 + -Player.posZ);
+GL11.glEnd();
+//skyBox2.bind();
+GL11.glBegin(GL11.GL_QUADS);
+GL11.glTexCoord2f(0, 0);GL11.glVertex3f(-50000 + -Player.posX, -50000-Player.posY,-50000 + -Player.posZ);
+GL11.glTexCoord2f(1, 0);GL11.glVertex3f(50000 + -Player.posX, -50000-Player.posY,-50000 +- Player.posZ);
+GL11.glTexCoord2f(1, 1);GL11.glVertex3f(50000 +- Player.posX, -50000-Player.posY,50000 + -Player.posZ);
+GL11.glTexCoord2f(0, 1);GL11.glVertex3f(-50000 + -Player.posX, -50000-Player.posY,50000 + -Player.posZ);
+GL11.glEnd();
+}
 }

@@ -8,6 +8,7 @@ public class WindowVariables {
 public static double fps = 0;
 static int width = 0;
 static int height = 0;
+static int test = 1;
 static boolean pressedRightClick = false;
 static boolean pressedLeftClick = false;
 static float camXoffset = 0;
@@ -16,6 +17,7 @@ static float camZoffset = 0;
 static float camPitch = 0;
 static float camYaw = 0;
 static FloatBuffer fb;
+public static ShaderProgram shaderProgram;
 static Matrix4f m;
 static boolean done = false;
 

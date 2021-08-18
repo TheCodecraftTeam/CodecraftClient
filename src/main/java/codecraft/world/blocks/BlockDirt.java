@@ -26,8 +26,8 @@ public class BlockDirt extends Block {
 		
 		
 	glBegin(GL_QUADS);
-		GL11.glTexCoord2f(0.0f+ 0.1f, 0.0f); GL11.glVertex3f(-0.5f + this.getGlobalX(), -0.5f +this.getGlobalY() ,  0.5f +  +this.getGlobalZ());	// Bottom Left Of The Texture and Quad
-		GL11.glTexCoord2f(0.1f+ 0.1f, 0.0f); GL11.glVertex3f( 0.5f + this.getGlobalX(), -0.5f +this.getGlobalY() ,  0.5f +this.getGlobalZ());	// Bottom Right Of The Texture and Quad
+		GL11.glTexCoord2f(0.0f+ 0.1f,0.0f); GL11.glVertex3f(-0.5f + this.getGlobalX(), -0.5f +this.getGlobalY() ,  0.5f +  +this.getGlobalZ());	// Bottom Left Of The Texture and Quad
+		GL11.glTexCoord2f(0.1f+ 0.1f,0.0f); GL11.glVertex3f( 0.5f + this.getGlobalX(), -0.5f +this.getGlobalY() ,  0.5f +this.getGlobalZ());	// Bottom Right Of The Texture and Quad
 		GL11.glTexCoord2f(0.1f+ 0.1f, 0.1f); GL11.glVertex3f( 0.5f + this.getGlobalX(), 0.5f +this.getGlobalY() ,  0.5f +this.getGlobalZ());	// Top Right Of The Texture and Quad
 		GL11.glTexCoord2f(0.0f+ 0.1f, 0.1f); GL11.glVertex3f(-0.5f + this.getGlobalX(), 0.5f +this.getGlobalY() ,  0.5f +this.getGlobalZ());	// Top Left Of The Texture and Quad
 		// Back Face
@@ -36,17 +36,17 @@ public class BlockDirt extends Block {
 		
 		
 		
-		GL11.glTexCoord2f(0.1f+ 0.1f, 0.0f); GL11.glVertex3f(-0.5f + this.getGlobalX(), -0.5f +this.getGlobalY() , -0.5f +this.getGlobalZ());	// Bottom Right Of The Texture and Quad
+		GL11.glTexCoord2f(0.1f+ 0.1f,0.0f); GL11.glVertex3f(-0.5f + this.getGlobalX(), -0.5f +this.getGlobalY() , -0.5f +this.getGlobalZ());	// Bottom Right Of The Texture and Quad
 		GL11.glTexCoord2f(0.1f+ 0.1f, 0.1f); GL11.glVertex3f(-0.5f + this.getGlobalX(),   0.5f + this.getGlobalY() , -0.5f +this.getGlobalZ());	// Top Right Of The Texture and Quad
 		GL11.glTexCoord2f(0.0f+ 0.1f, 0.1f); GL11.glVertex3f( 0.5f + this.getGlobalX(), 0.5f +this.getGlobalY() , -0.5f +this.getGlobalZ());	// Top Left Of The Texture and Quad
-		GL11.glTexCoord2f(0.0f+ 0.1f, 0.0f); GL11.glVertex3f( 0.5f + this.getGlobalX(), -0.5f +this.getGlobalY() , -0.5f +this.getGlobalZ());	// Bottom Left Of The Texture and Quad
+		GL11.glTexCoord2f(0.0f+ 0.1f,0.0f); GL11.glVertex3f( 0.5f + this.getGlobalX(), -0.5f +this.getGlobalY() , -0.5f +this.getGlobalZ());	// Bottom Left Of The Texture and Quad
 		// Top Face
 		GL11.glEnd();
 		
 		glBegin(GL_QUADS);
 		GL11.glTexCoord2f(0.0f+ 0.1f, 0.1f); GL11.glVertex3f(-0.5f + this.getGlobalX(), 0.5f +this.getGlobalY() , -0.5f +this.getGlobalZ());	// Top Left Of The Texture and Quad
-		GL11.glTexCoord2f(0.0f+ 0.1f, 0.0f); GL11.glVertex3f(-0.5f + this.getGlobalX(),0.5f + this.getGlobalY() ,  0.5f  +this.getGlobalZ());	// Bottom Left Of The Texture and Quad
-		GL11.glTexCoord2f(0.1f+ 0.1f, 0.0f); GL11.glVertex3f( 0.5f + this.getGlobalX(), 0.5f +this.getGlobalY() ,  0.5f +this.getGlobalZ());	// Bottom Right Of The Texture and Quad
+		GL11.glTexCoord2f(0.0f+ 0.1f,0.0f); GL11.glVertex3f(-0.5f + this.getGlobalX(),0.5f + this.getGlobalY() ,  0.5f  +this.getGlobalZ());	// Bottom Left Of The Texture and Quad
+		GL11.glTexCoord2f(0.1f+ 0.1f,0.0f); GL11.glVertex3f( 0.5f + this.getGlobalX(), 0.5f +this.getGlobalY() ,  0.5f +this.getGlobalZ());	// Bottom Right Of The Texture and Quad
 		GL11.glTexCoord2f(0.1f+ 0.1f, 0.1f); GL11.glVertex3f( 0.5f + this.getGlobalX(), 0.5f +this.getGlobalY() , -0.5f +this.getGlobalZ()) ;	// Top Right Of The Texture and Quad
 		// Bottom Face
 		
@@ -55,25 +55,25 @@ public class BlockDirt extends Block {
 		glBegin(GL_QUADS);
 	GL11.glTexCoord2f(0.1f+ 0.1f, 0.1f); GL11.glVertex3f(-0.5f + this.getGlobalX(), -0.5f +this.getGlobalY() , -0.5f +this.getGlobalZ());	// Top Right Of The Texture and Quad
 		GL11.glTexCoord2f(0.0f+ 0.1f, 0.1f); GL11.glVertex3f( 0.5f + this.getGlobalX(), -0.5f +this.getGlobalY() , -0.5f +this.getGlobalZ());	// Top Left Of The Texture and Quad
-		GL11.glTexCoord2f(0.0f+ 0.1f, 0.0f); GL11.glVertex3f( 0.5f + this.getGlobalX(), -0.5f +this.getGlobalY() ,  0.5f+this.getGlobalZ());	// Bottom Left Of The Texture and Quad
-		GL11.glTexCoord2f(0.1f+ 0.1f, 0.0f); GL11.glVertex3f(-0.5f + this.getGlobalX(), -0.5f +this.getGlobalY() ,  0.5f +this.getGlobalZ());	// Bottom Right Of The Texture and Quad
+		GL11.glTexCoord2f(0.0f+ 0.1f,0.0f); GL11.glVertex3f( 0.5f + this.getGlobalX(), -0.5f +this.getGlobalY() ,  0.5f+this.getGlobalZ());	// Bottom Left Of The Texture and Quad
+		GL11.glTexCoord2f(0.1f+ 0.1f,0.0f); GL11.glVertex3f(-0.5f + this.getGlobalX(), -0.5f +this.getGlobalY() ,  0.5f +this.getGlobalZ());	// Bottom Right Of The Texture and Quad
 		// Right face
 	
 		
 		
 		
-	GL11.glTexCoord2f(0.1f+ 0.1f, 0.0f); GL11.glVertex3f( 0.5f + this.getGlobalX(), -0.5f +this.getGlobalY() , -0.5f +this.getGlobalZ());	// Bottom Right Of The Texture and Quad
+	GL11.glTexCoord2f(0.1f+ 0.1f,0.0f); GL11.glVertex3f( 0.5f + this.getGlobalX(), -0.5f +this.getGlobalY() , -0.5f +this.getGlobalZ());	// Bottom Right Of The Texture and Quad
 	GL11.glTexCoord2f(0.1f+ 0.1f, 0.1f); GL11.glVertex3f( 0.5f + this.getGlobalX(), 0.5f +this.getGlobalY() , -0.5f +this.getGlobalZ());	// Top Right Of The Texture and Quad
 	GL11.glTexCoord2f(0.0f+ 0.1f, 0.1f); GL11.glVertex3f( 0.5f + this.getGlobalX(), 0.5f +this.getGlobalY() ,  0.5f +this.getGlobalZ());	// Top Left Of The Texture and Quad
-	GL11.glTexCoord2f(0.0f+ 0.1f, 0.0f); GL11.glVertex3f( 0.5f + this.getGlobalX(), -0.5f +this.getGlobalY() ,  0.5f +this.getGlobalZ());	// Bottom Left Of The Texture and Quad
+	GL11.glTexCoord2f(0.0f+ 0.1f,0.0f); GL11.glVertex3f( 0.5f + this.getGlobalX(), -0.5f +this.getGlobalY() ,  0.5f +this.getGlobalZ());	// Bottom Left Of The Texture and Quad
 		// Left Face
 		
 		
 
 		
 		
-	GL11.glTexCoord2f(0.0f+ 0.1f, 0.0f); GL11.glVertex3f(-0.5f + this.getGlobalX(), -0.5f +this.getGlobalY() , -0.5f +this.getGlobalZ());	// Bottom Left Of The Texture and Quad
-	GL11.glTexCoord2f(0.1f+ 0.1f, 0.0f); GL11.glVertex3f(-0.5f + this.getGlobalX(), -0.5f +this.getGlobalY() ,  0.5f +this.getGlobalZ());	// Bottom Right Of The Texture and Quad
+	GL11.glTexCoord2f(0.0f+ 0.1f,0.0f); GL11.glVertex3f(-0.5f + this.getGlobalX(), -0.5f +this.getGlobalY() , -0.5f +this.getGlobalZ());	// Bottom Left Of The Texture and Quad
+	GL11.glTexCoord2f(0.1f+ 0.1f,0.0f); GL11.glVertex3f(-0.5f + this.getGlobalX(), -0.5f +this.getGlobalY() ,  0.5f +this.getGlobalZ());	// Bottom Right Of The Texture and Quad
 	GL11.glTexCoord2f(0.1f+ 0.1f, 0.1f); GL11.glVertex3f(-0.5f + this.getGlobalX(), 0.5f +this.getGlobalY() ,  0.5f +this.getGlobalZ());	// Top Right Of The Texture and Quad
 	GL11.glTexCoord2f(0.0f+ 0.1f, 0.1f); GL11.glVertex3f(-0.5f + this.getGlobalX(), 0.5f +this.getGlobalY()  , -0.5f +this.getGlobalZ());	// Top Left Of The Texture and Quad
 		GL11.glEnd();
