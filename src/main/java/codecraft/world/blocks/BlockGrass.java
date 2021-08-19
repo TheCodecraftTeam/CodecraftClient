@@ -47,12 +47,12 @@ public class BlockGrass extends Block {
 
 			// texture coord array
 			public static float texCoords[] = {
-			    0.2f,   0,   0, 0,   0, 1,   1, 1,               // v0,v1,v2,v3 (front)
-			    0, 0,   0, 1,   1, 1,   1, 0,               // v0,v3,v4,v5 (right)
-			    0.2f, 0.1f,   1, 0,   0, 0,   0, 1,               // v0,v5,v6,v1 (top)
-			    0.2f, 0,   0, 0,   0, 1,   1, 1,               // v1,v6,v7,v2 (left)
-			    0, 0.1f,   1, 1,   1, 0,   0, 0,               // v7,v4,v3,v2 (bottom)
-			    0, 0.1f,   1, 1,   1, 0,   0, 0                // v4,v7,v6,v5 (back)
+			    0.2f,   0,   0, 0,   0, 0.1f,   0.2f, 0.1f,               // v0,v1,v2,v3 (front)
+			    0, 0,   0, 0.1f,   0.2f, 0.1f,   0.2f, 0,               // v0,v3,v4,v5 (right)
+			    0.1f, 0.1f,   0.1f, 0,   0, 0,   0, 0.1f,               // v0,v5,v6,v1 (top)
+			    0.2f, 0,   0, 0,   0, 0.1f,   0.2f, 0.1f,               // v1,v6,v7,v2 (left)
+			    0, 0.1f,   0.2f, 0.1f,   0.1f, 0,   0, 0,               // v7,v4,v3,v2 (bottom)
+			    0, 0.1f,   0.2f, 0.1f,   0.2f, 0,   0, 0                // v4,v7,v6,v5 (back)
 			};
 
 			// index array for glDrawElements()
